@@ -1,0 +1,24 @@
+[submodule "IPlugin"]
+	path = IPlugin
+	url = git@github.com:CommentViewerCollection/IPlugin.git
+[submodule "BrowserCookieInterfaces"]
+	path = BrowserCookieInterfaces
+	url = git@github.com:CommentViewerCollection/BrowserCookieInterfaces.git
+[submodule "BrowserCookieImplementations"]
+	path = BrowserCookieImplementations
+	url = git@github.com:CommentViewerCollection/BrowserCookieImplementations.git
+[submodule "ISitePlugin"]
+	path = ISitePlugin
+	url = git@github.com:CommentViewerCollection/ISitePlugin.git
+[submodule "Common"]
+	path = Common
+	url = git@github.com:CommentViewerCollection/Common.git
+[submodule "YouTubeLiveSitePlugin"]
+	path = YouTubeLiveSitePlugin
+	url = git@github.com:CommentViewerCollection/YouTubeLiveSitePlugin.git
+[submodule "CommentGeneratorPlugin"]
+	path = CommentGeneratorPlugin
+	url = git@github.com:CommentViewerCollection/CommentGeneratorPlugin.git
+[submodule "BouyomiPlugin"]
+	path = BouyomiPlugin
+	url = git@github.com:CommentViewerCollection/BouyomiPlugin.git
