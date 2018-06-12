@@ -1,4 +1,5 @@
-﻿using SitePlugin;
+﻿using Common;
+using SitePlugin;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -53,5 +54,7 @@ namespace YouTubeLiveCommentViewer
         int PostTimeDisplayIndex { get; set; }
         double PostTimeWidth { get; set; }
         bool IsShowPostTime { get; set; }
+
+        InfoType ShowingInfoLevel { get; set; }
     }
 }

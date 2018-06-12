@@ -562,6 +562,10 @@ namespace YouTubeLiveCommentViewer.ViewModel
         public ObservableCollection<ICommentViewModel> Comments { get; } = new ObservableCollection<ICommentViewModel>();
         private void AddComment(ICommentViewModel cvm)
         {
+            if (cvm is IInfoCommentViewModel info && info.Type > _options.ShowingInfoLevel)
+            {
+                return;
+            }
             if (_isAddingNewCommentTop)
             {
                 Comments.Insert(0, cvm);

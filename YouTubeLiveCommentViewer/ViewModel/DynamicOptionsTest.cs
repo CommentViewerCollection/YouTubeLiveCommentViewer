@@ -61,6 +61,7 @@ namespace YouTubeLiveCommentViewer
         public bool IsUserNameWrapping { get => GetValue(); set => SetValue(value); }
         public bool IsAddingNewCommentTop { get => GetValue(); set => SetValue(value); }
         public bool IsPixelScrolling { get => GetValue(); set => SetValue(value); }
+        public InfoType ShowingInfoLevel { get => GetValue(); set => SetValue(value); }
         protected override void Init()
         {
             Dict.Add(nameof(FontFamily), new Item { DefaultValue = new FontFamily("メイリオ, Meiryo"), Predicate = f => true, Serializer = f => FontFamilyToString(f), Deserializer = s => FontFamilyFromString(s) });
@@ -117,7 +118,11 @@ namespace YouTubeLiveCommentViewer
             Dict.Add(nameof(IsUserNameWrapping), new Item { DefaultValue = false, Predicate = b => true, Serializer = b => b.ToString(), Deserializer = s => bool.Parse(s) });
             Dict.Add(nameof(IsAddingNewCommentTop), new Item { DefaultValue = false, Predicate = b => true, Serializer = b => b.ToString(), Deserializer = s => bool.Parse(s) });
             Dict.Add(nameof(IsPixelScrolling), new Item { DefaultValue = true, Predicate = b => true, Serializer = b => b.ToString(), Deserializer = s => bool.Parse(s) });
-
+#if DEBUG
+            Dict.Add(nameof(ShowingInfoLevel), new Item { DefaultValue = InfoType.Debug, Predicate = b => true, Serializer = b => b.ToString(), Deserializer = s => InfoTypeRelatedOperations.ToInfoType(s) });
+#else
+            Dict.Add(nameof(ShowingInfoLevel), new Item { DefaultValue = InfoType.Notice, Predicate = b => true, Serializer = b => b.ToString(), Deserializer = s => bool.Parse(s) });
+#endif
             //以下使わないけど、IOptionsに要求される
             //Dict.Add(nameof(ConnectionNameWidth), new Item { DefaultValue = 100, Predicate = n => n > 0, Serializer = n => n.ToString(), Deserializer = s => double.Parse(s) });
             //Dict.Add(nameof(CommentIdWidth), new Item { DefaultValue = 100, Predicate = n => n > 0, Serializer = n => n.ToString(), Deserializer = s => double.Parse(s) });

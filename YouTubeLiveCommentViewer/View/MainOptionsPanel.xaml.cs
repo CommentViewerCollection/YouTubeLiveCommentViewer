@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -14,6 +15,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Common;
 using Common.Wpf;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
@@ -156,6 +158,12 @@ namespace YouTubeLiveCommentViewer
             get { return ChangedOptions.IsPixelScrolling; }
             set { ChangedOptions.IsPixelScrolling = value; }
         }
+        public ObservableCollection<InfoType> InfoTypeCollection { get; private set; }
+        public InfoType SelectedInfoType
+        {
+            get => ChangedOptions.ShowingInfoLevel;
+            set => ChangedOptions.ShowingInfoLevel = value;
+        }
         private readonly IOptions _origin;
         private readonly IOptions changed;
         public IOptions OriginOptions { get { return _origin; } }
@@ -165,6 +173,9 @@ namespace YouTubeLiveCommentViewer
             _origin = options;
             changed = options.Clone() as IOptions;
             ShowFontSelectorCommand = new RelayCommand(ShowFontSelector);
+
+            InfoTypeCollection = new ObservableCollection<InfoType>(Enum.GetValues(typeof(InfoType)).Cast<InfoType>());
+            SelectedInfoType = options.ShowingInfoLevel;
         }
         public MainOptionsViewModel()
         {
