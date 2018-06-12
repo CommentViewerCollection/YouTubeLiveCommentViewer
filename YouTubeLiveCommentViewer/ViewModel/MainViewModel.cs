@@ -309,9 +309,9 @@ namespace YouTubeLiveCommentViewer.ViewModel
             _canClose = true;
             App.Current.Shutdown();
         }
-        void SetInfo(string message)
+        void SetInfo(string message, InfoType type)
         {
-            var cvm = new InfoCommentViewModel(_options, message);
+            var cvm = new InfoCommentViewModel(_options, message, type);
             AddComment(cvm);
         }
         private async Task CheckIfUpdateExists(bool isAutoCheck)
@@ -327,7 +327,7 @@ namespace YouTubeLiveCommentViewer.ViewModel
                 _logger.LogException(ex);
                 if (!isAutoCheck)
                 {
-                    SetInfo("サーバに障害が発生している可能性があります。しばらく経ってから再度試してみて下さい。");
+                    SetInfo("サーバに障害が発生している可能性があります。しばらく経ってから再度試してみて下さい。", InfoType.Error);
                 }
                 return;
             }
@@ -617,7 +617,7 @@ namespace YouTubeLiveCommentViewer.ViewModel
             {
                 _logger.LogException(ex);
             }
-            SetInfo("切断されました");
+            SetInfo("切断されました", InfoType.Notice);
         }
         private void Disconnect()
         {
