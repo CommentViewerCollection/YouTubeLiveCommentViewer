@@ -93,6 +93,7 @@ namespace YouTubeLiveCommentViewer.View
                     updateView.CurrentVersion = message.CurrentVersion;
                     updateView.LatestVersionInfo = message.LatestVersionInfo;
                     updateView.Owner = this;
+                    updateView.Logger = message.Logger;
                     updateView.ShowDialog();
                 }
                 catch (Exception ex)
