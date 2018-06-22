@@ -58,7 +58,7 @@ namespace YouTubeLiveCommentViewer
             }
             catch { }
 
-            var siteContext = new YouTubeLiveSiteContext(options, _logger, new UserStoreTest());
+            var siteContext = new YouTubeLiveSiteContext(options,new YouTubeLiveServer(), _logger, new UserStoreTest());
 
             var vm = new ViewModel.MainViewModel(siteContext, options, io, _logger);
             var resource = Application.Current.Resources;
