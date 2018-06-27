@@ -58,6 +58,7 @@ namespace YouTubeLiveCommentViewer
                 Comment = GetString(comment.MessageItems),
                 IsNgUser = false,
                 Nickname = GetString(comment.NameItems),
+                SiteName = "youtubelive",
             };
             foreach (var plugin in _plugins)
             {
