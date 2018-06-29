@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-
+using YouTubeLiveCommentViewer.ViewModel;
 namespace YouTubeLiveCommentViewer
 {
     internal class MainViewCloseMessage : MessageBase { }
@@ -24,14 +24,14 @@ namespace YouTubeLiveCommentViewer
             Tabs = tabs;
         }
     }
-    //class ShowUserViewMessage : MessageBase
-    //{
-    //    public UserViewModel Uvm { get; }
-    //    public ShowUserViewMessage(UserViewModel uvm)
-    //    {
-    //        Uvm = uvm;
-    //    }
-    //}
+    class ShowUserViewMessage : MessageBase
+    {
+        public UserViewModel Uvm { get; }
+        public ShowUserViewMessage(UserViewModel uvm)
+        {
+            Uvm = uvm;
+        }
+    }
     class SetPostCommentPanel : MessageBase
     {
         public UserControl Panel { get; }

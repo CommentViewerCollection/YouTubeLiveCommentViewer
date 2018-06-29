@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,110 +12,40 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using Common.Wpf;
-using GalaSoft.MvvmLight.Messaging;
-
-namespace YouTubeLiveCommentViewer.View
+using System.Diagnostics;
+namespace YouTubeLiveCommentViewer
 {
     /// <summary>
-    /// Interaction logic for MainWindow.xaml
+    /// Interaction logic for CommentDataGrid.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class CommentDataGrid : UserControl
     {
-        OptionsView optionsView;
-        public MainWindow()
+        public CommentDataGrid()
         {
             InitializeComponent();
-            Messenger.Default.Register<MainViewCloseMessage>(this, message =>
-            {
-                this.Close();
-            });
-            Messenger.Default.Register<SetAddingCommentDirection>(this, message =>
-            {
-                _addingCommentToTop = message.IsTop;
-            });
-            Messenger.Default.Register<SetPostCommentPanel>(this, message =>
-            {
-                PostCommentPanelPlaceHolder.Children.Clear();
+            dataGrid.MouseRightButtonUp += DataGrid_MouseRightButtonUp;
+            
+        }
 
-                var newPanel = message.Panel;
-                if (newPanel == null)
-                {
-                    PostCommentPanelPlaceHolder.IsEnabled = false;
-                }
-                else
-                {
-                    PostCommentPanelPlaceHolder.IsEnabled = true;
-                    newPanel.Margin = new Thickness(0);
-                    newPanel.VerticalAlignment = VerticalAlignment.Stretch;
-                    newPanel.HorizontalAlignment = HorizontalAlignment.Stretch;
-                    newPanel.Width = double.NaN;
-                    newPanel.Height = double.NaN;
-                    PostCommentPanelPlaceHolder.Children.Add(newPanel);
-                }
-            });
-            Messenger.Default.Register<ShowOptionsViewMessage>(this, message =>
+
+        public bool IsShowUserInfoMenuItem
+        {
+            get { return (bool)GetValue(IsShowUserInfoMenuItemProperty); }
+            set { SetValue(IsShowUserInfoMenuItemProperty, value); }
+        }
+                
+        public static readonly DependencyProperty IsShowUserInfoMenuItemProperty =
+            DependencyProperty.Register("IsShowUserInfoMenuItem", typeof(bool), typeof(CommentDataGrid), new PropertyMetadata(true, OnCurrentReadingChanged));
+
+        private static void OnCurrentReadingChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            if(d  is CommentDataGrid dataGrid)
             {
-                try
-                {
-                    if (optionsView == null)
-                    {
-                        optionsView = new OptionsView();
-                        optionsView.Owner = this;
-                    }
-                    optionsView.Clear();
-                    foreach (var tab in message.Tabs)
-                    {
-                        optionsView.AddTabPage(tab);
-                    }
-                    
-                    var showPos = Tools.GetShowPos(Tools.GetMousePos(), optionsView);
-                    optionsView.Left = showPos.X;
-                    optionsView.Top = showPos.Y;
-                    optionsView.Show();
-                }
-                catch (Exception ex)
-                {
-                    Debug.WriteLine(ex.Message);
-                    Debugger.Break();
-                }
-            });
-            Messenger.Default.Register<Common.AutoUpdate.ShowUpdateDialogMessage>(this, message =>
-            {
-                try
-                {
-                    var updateView = new Common.AutoUpdate.UpdateView();
-                    var showPos = Tools.GetShowPos(Tools.GetMousePos(), updateView);
-                    updateView.Left = showPos.X;
-                    updateView.Top = showPos.Y;
-                    updateView.IsUpdateExists = message.IsUpdateExists;
-                    updateView.CurrentVersion = message.CurrentVersion;
-                    updateView.LatestVersionInfo = message.LatestVersionInfo;
-                    updateView.Owner = this;
-                    updateView.Logger = message.Logger;
-                    updateView.ShowDialog();
-                }
-                catch (Exception ex)
-                {
-                    Debug.WriteLine(ex.Message);
-                }
-            });
-            Messenger.Default.Register<ShowUserViewMessage>(this, message =>
-            {
-                try
-                {
-                    var uvm = message.Uvm;
-                    var userView = new UserView
-                    {
-                        DataContext = uvm
-                    };
-                    userView.Show();
-                }
-                catch (Exception ex)
-                {
-                    Debug.WriteLine(ex.Message);
-                }
-            });
+                var menu = dataGrid.dataGrid.Resources["commentContext"] as ContextMenu;
+                Debug.Assert(menu != null);
+                var userInfoMenuItem = LogicalTreeHelper.FindLogicalNode(menu, "UserInfoMenuItem") as MenuItem;
+                userInfoMenuItem.Visibility = (bool)e.NewValue ? Visibility.Visible : Visibility.Collapsed;
+            }
         }
         /// <summary>
         /// 
@@ -242,16 +171,6 @@ namespace YouTubeLiveCommentViewer.View
         public static ScrollViewer GetScrollViewer(this DataGrid dataGrid)
         {
             return dataGrid.Template.FindName("DG_ScrollViewer", dataGrid) as ScrollViewer;
-        }
-    }
-    public static class ScrollViewerBehavior
-    {
-        public static bool IsBottom(this ScrollViewer sv)
-        {
-            //var b = (sv.VerticalOffset * 1.01) > sv.ScrollableHeight;
-            var b = (sv.VerticalOffset >= sv.ScrollableHeight
-                || sv.ExtentHeight < sv.ViewportHeight);
-            return b;
         }
     }
 }
