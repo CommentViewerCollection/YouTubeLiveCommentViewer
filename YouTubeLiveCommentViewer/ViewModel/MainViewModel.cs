@@ -17,6 +17,8 @@ using GalaSoft.MvvmLight.Command;
 using System.Collections.ObjectModel;
 using System.Windows.Media;
 using System.Windows.Data;
+using System.Text.RegularExpressions;
+using System.Windows;
 
 namespace YouTubeLiveCommentViewer.ViewModel
 {
@@ -36,6 +38,8 @@ namespace YouTubeLiveCommentViewer.ViewModel
         public ICommand RemoveSelectedConnectionCommand { get; }
         public ICommand AddNewConnectionCommand { get; }
         public ICommand ClearAllCommentsCommand { get; }
+        public ICommand CommentCopyCommand { get; }
+        public ICommand OpenUrlCommand { get; }
         #endregion //Commands
 
         #region Fields
@@ -487,7 +491,6 @@ namespace YouTubeLiveCommentViewer.ViewModel
             _options = options;
             _io = io;
             _logger = logger;
-
             MainViewContentRenderedCommand = new RelayCommand(ContentRendered);
             MainViewClosingCommand = new RelayCommand<CancelEventArgs>(Closing);
             ShowOptionsWindowCommand = new RelayCommand(ShowOptionsWindow);
@@ -498,6 +501,10 @@ namespace YouTubeLiveCommentViewer.ViewModel
             //ShowUserInfoCommand = new RelayCommand(ShowUserInfo);
             ConnectCommand = new RelayCommand(Connect);
             DisconnectCommand = new RelayCommand(Disconnect);
+            ShowUserInfoCommand = new RelayCommand(ShowUserInfo);
+
+            OpenUrlCommand = new RelayCommand(OpenUrl);
+            CommentCopyCommand = new RelayCommand(CopyComment);
             options.PropertyChanged += (s, e) =>
             {
                 switch (e.PropertyName)
@@ -521,7 +528,120 @@ namespace YouTubeLiveCommentViewer.ViewModel
                 }
             };
         }
+        private void OpenUrl()
+        {
+            var text = SelectedComment.MessageItems.ToText();
+            var list = ExtractUrl(text);
+            if (list.Count > 0)
+            {
+                Process.Start(list[0]);
+            }
+        }
+        public bool ContainsUrl
+        {
+            get
+            {
+                if (SelectedComment == null)
+                    return false;
+                var text = SelectedComment.MessageItems.ToText();
+                var list = ExtractUrl(text);
+                return list.Count > 0;
+            }
+        }
+        private void CopyComment()
+        {
+            var items = SelectedComment.MessageItems;
 
+            var strs = items.Where(a => a is IMessageText).Cast<IMessageText>().Select(b => b.Text);
+            var str = string.Join("", strs);
+            try
+            {
+                Clipboard.SetText(str);
+            }
+            catch (System.Runtime.InteropServices.COMException ex)
+            {
+
+                SetInfo("クリップボードのオープンに失敗しました。", InfoType.Error);
+            }
+        }
+        /// <summary>
+        /// 文字列からURLを抽出する
+        /// </summary>
+        /// <param name="str"></param>
+        /// <returns></returns>
+        public static List<string> ExtractUrl(string str)
+        {
+            const string urlPattern = @"(?:h?ttps?://|www\.)\S+";
+            var matches = Regex.Matches(str, urlPattern, RegexOptions.Compiled | RegexOptions.Singleline);
+            var list = new List<string>();
+            foreach (Match match in matches)
+            {
+                list.Add(match.Groups[0].Value);
+            }
+            return list;
+        }
+        public ICommentViewModel SelectedComment
+        {
+            get
+            {
+                return _selectedComment;
+            }
+            set
+            {
+                if (_selectedComment == value)
+                    return;
+                _selectedComment = value;
+                RaisePropertyChanged(nameof(ContainsUrl));
+            }
+        }
+        private void ShowUserInfo()
+        {
+            var current = SelectedComment;
+            try
+            {
+                Debug.Assert(current != null);
+
+                var userId = current.UserId;
+                if (string.IsNullOrEmpty(userId))
+                {
+                    Debug.WriteLine("UserIdがnull");
+                    return;
+                }
+                var view = new CollectionViewSource { Source = Comments }.View;
+                view.Filter = obj =>
+                {
+                    if (!(obj is YouTubeLiveCommentViewModel cvm))
+                    {
+                        return false;
+                    }
+                    return cvm.UserId == userId;
+                };
+                //ICommentProviderが必要。。。ConnectionViewModel経由で取れないだろうか。
+                //Connectionを切断したり、サイトを変更してもコメントは残る。残ったコメントのユーザ情報を見ようとした時にConnectionViewModel経由で取るのは無理だろう。
+                //やっぱりCommentViewModelにICommentProviderを持たせるしかなさそう。
+                ICommentProvider commentProvider = current.CommentProvider;
+                //var s = commentProvider.GetUserComments(current.User) as ObservableCollection<ICommentViewModel>;
+                //var collection = new ObservableCollection<McvCommentViewModel>(s.Select(m => new McvCommentViewModel(m, current.ConnectionName));
+
+                //s.CollectionChanged += (sender, e) =>
+                //{
+                //    switch (e.Action)
+                //    {
+                //        case System.Collections.Specialized.NotifyCollectionChangedAction.Add:
+                //            break;
+                //    }
+                //};
+                var user = current.User;
+                var uvm = new UserViewModel(user, _options, view);
+                MessengerInstance.Send(new ShowUserViewMessage(uvm));
+            }
+
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+                _logger.LogException(ex);
+            }
+        }
         private void CommentProvider_MetadataUpdated(object sender, IMetadata e)
         {
             if (e.Title != null)
@@ -591,6 +711,8 @@ namespace YouTubeLiveCommentViewer.ViewModel
         }
         bool IsValidInput { get; set; }
         private string _input;
+        private ICommentViewModel _selectedComment;
+
         public string Input
         {
             get { return _input; }
