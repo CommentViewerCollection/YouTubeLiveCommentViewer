@@ -13,6 +13,8 @@
         <w:NameConverter x:Key="nameConverter" />
     </Window.Resources>
     <Grid>
+        <!--Element treeに属さないelementにDataContextを渡すためのdummy element-->
+        <FrameworkElement x:Name="dummyElement" Visibility="Collapsed" DataContext="{Binding}"/>
         <local:CommentDataGrid IsShowUserInfoMenuItem="False" HorizontalAlignment="Stretch" Margin="0,180,0,0" VerticalAlignment="Stretch" Width="Auto"/>
         <TextBlock HorizontalAlignment="Left" Margin="125,55,0,0" TextWrapping="Wrap" Text="{Binding UserId}" VerticalAlignment="Top"/>
         <Label Content="ユーザID" HorizontalAlignment="Left" Margin="40,50,0,0" VerticalAlignment="Top"/>

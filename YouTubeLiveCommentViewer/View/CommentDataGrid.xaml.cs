@@ -23,8 +23,7 @@ namespace YouTubeLiveCommentViewer
         public CommentDataGrid()
         {
             InitializeComponent();
-            dataGrid.MouseRightButtonUp += DataGrid_MouseRightButtonUp;
-            
+            dataGrid.MouseRightButtonUp += DataGrid_MouseRightButtonUp;            
         }
 
 

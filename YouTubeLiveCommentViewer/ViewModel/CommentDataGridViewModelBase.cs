@@ -18,6 +18,8 @@ using System.Windows.Media;
 using System.ComponentModel;
 using System.Windows.Data;
 using System.Windows;
+using System.Text.RegularExpressions;
+using Common;
 
 namespace YouTubeLiveCommentViewer
 {
@@ -26,7 +28,10 @@ namespace YouTubeLiveCommentViewer
     /// </summary>
     public abstract class CommentDataGridViewModelBase : ViewModelBase
     {
-        public ICollectionView Comments { get; }
+        public ICommand CommentCopyCommand { get; }
+        public ICommand OpenUrlCommand { get; }
+
+        public ICollectionView Comments { get; protected set; }
         public System.Windows.Controls.ScrollUnit ScrollUnit
         {
             get
@@ -63,7 +68,7 @@ namespace YouTubeLiveCommentViewer
         public abstract bool IsShowThumbnailMenuItem { get; }
         public abstract bool IsShowUsernameMenuItem { get; }
         public abstract bool IsShowUserIdMenuItem { get; }
-        #region サムネ
+        #region Thumbnail
         public double ThumbnailWidth
         {
             get { return _options.ThumbnailWidth; }
@@ -80,6 +85,13 @@ namespace YouTubeLiveCommentViewer
             set { _options.ThumbnailDisplayIndex = value; }
         }
         #endregion
+
+        #region Username
+        public int UsernameDisplayIndex
+        {
+            get { return _options.UsernameDisplayIndex; }
+            set { _options.UsernameDisplayIndex = value; }
+        }
         public double UsernameWidth
         {
             get { return _options.UsernameWidth; }
@@ -90,11 +102,8 @@ namespace YouTubeLiveCommentViewer
             get { return _options.IsShowUsername; }
             set { _options.IsShowUsername = value; }
         }
-        public int UsernameDisplayIndex
-        {
-            get { return _options.UsernameDisplayIndex; }
-            set { _options.UsernameDisplayIndex = value; }
-        }
+        #endregion
+
         #region UserId
         public int UserIdDisplayIndex
         {
@@ -130,6 +139,8 @@ namespace YouTubeLiveCommentViewer
             set { _options.IsShowPostTime = value; }
         }
         #endregion
+
+        #region Message
         public double MessageWidth
         {
             get { return _options.MessageWidth; }
@@ -145,6 +156,8 @@ namespace YouTubeLiveCommentViewer
             get { return _options.MessageDisplayIndex; }
             set { _options.MessageDisplayIndex = value; }
         }
+        #endregion
+
         public Color SelectedRowBackColor
         {
             get { return _options.SelectedRowBackColor; }
@@ -155,7 +168,80 @@ namespace YouTubeLiveCommentViewer
             get { return _options.SelectedRowForeColor; }
             set { _options.SelectedRowForeColor = value; }
         }
-        public ICommentViewModel SelectedComment { get; set; }
+
+        #region SelectedComment
+        private ICommentViewModel _selectedComment;
+        public ICommentViewModel SelectedComment
+        {
+            get
+            {
+                return _selectedComment;
+            }
+            set
+            {
+                if (_selectedComment == value)
+                    return;
+                _selectedComment = value;
+                RaisePropertyChanged(nameof(ContainsUrl));
+            }
+        }
+        #endregion
+        /// <summary>
+        /// 文字列からURLを抽出する
+        /// </summary>
+        /// <param name="str"></param>
+        /// <returns></returns>
+        public static List<string> ExtractUrl(string str)
+        {
+            const string urlPattern = @"(?:h?ttps?://|www\.)\S+";
+            var matches = Regex.Matches(str, urlPattern, RegexOptions.Compiled | RegexOptions.Singleline);
+            var list = new List<string>();
+            foreach (Match match in matches)
+            {
+                list.Add(match.Groups[0].Value);
+            }
+            return list;
+        }
+        private void OpenUrl()
+        {
+            var text = SelectedComment.MessageItems.ToText();
+            var list = ExtractUrl(text);
+            if (list.Count > 0)
+            {
+                Process.Start(list[0]);
+            }
+        }
+        public bool ContainsUrl
+        {
+            get
+            {
+                if (SelectedComment == null)
+                    return false;
+                var text = SelectedComment.MessageItems.ToText();
+                var list = ExtractUrl(text);
+                return list.Count > 0;
+            }
+        }
+        private void CopyComment()
+        {
+            var items = SelectedComment.MessageItems;
+
+            var strs = items.Where(a => a is IMessageText).Cast<IMessageText>().Select(b => b.Text);
+            var str = string.Join("", strs);
+            try
+            {
+                Clipboard.SetText(str);
+            }
+            catch (System.Runtime.InteropServices.COMException ex)
+            {
+
+                SetInfo("クリップボードのオープンに失敗しました。", InfoType.Error);
+            }
+        }
+        protected virtual void SetInfo(string message, InfoType type)
+        {
+            Debug.WriteLine(message);
+        }
         private readonly IOptions _options;
 
         public CommentDataGridViewModelBase(IOptions options)
@@ -175,6 +261,8 @@ namespace YouTubeLiveCommentViewer
                         break;
                 }
             };
+            OpenUrlCommand = new RelayCommand(OpenUrl);
+            CommentCopyCommand = new RelayCommand(CopyComment);
         }
     }
 }

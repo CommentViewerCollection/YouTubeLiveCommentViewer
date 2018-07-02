@@ -22,7 +22,7 @@ using System.Windows;
 
 namespace YouTubeLiveCommentViewer.ViewModel
 {
-    public class MainViewModel : ViewModelBase
+    public class MainViewModel : CommentDataGridViewModelBase
     {
         #region Commands
         public ICommand ActivatedCommand { get; }
@@ -38,8 +38,7 @@ namespace YouTubeLiveCommentViewer.ViewModel
         public ICommand RemoveSelectedConnectionCommand { get; }
         public ICommand AddNewConnectionCommand { get; }
         public ICommand ClearAllCommentsCommand { get; }
-        public ICommand CommentCopyCommand { get; }
-        public ICommand OpenUrlCommand { get; }
+
         #endregion //Commands
 
         #region Fields
@@ -64,6 +63,12 @@ namespace YouTubeLiveCommentViewer.ViewModel
             }
         }
         #endregion
+
+        public override bool IsShowUsernameMenuItem => true;
+        public override bool IsShowUserIdMenuItem => true;
+        public override bool IsShowUserInfoMenuItem => true;
+        public override bool IsShowThumbnailMenuItem => true;
+
         public bool Topmost
         {
             get { return _options.IsTopmost; }
@@ -127,120 +132,6 @@ namespace YouTubeLiveCommentViewer.ViewModel
                 return s;
             }
         }
-        #region Thumbnail
-        public int ThumbnailDisplayIndex
-        {
-            get { return _options.ThumbnailDisplayIndex; }
-            set { _options.ThumbnailDisplayIndex = value; }
-        }
-        public double ThumbnailWidth
-        {
-            get { return _options.ThumbnailWidth; }
-            set { _options.ThumbnailWidth = value; }
-        }
-        public bool IsShowThumbnail
-        {
-            get { return _options.IsShowThumbnail; }
-            set { _options.IsShowThumbnail = value; }
-        }
-        #endregion
-
-        #region Username
-        public int UsernameDisplayIndex
-        {
-            get { return _options.UsernameDisplayIndex; }
-            set { _options.UsernameDisplayIndex = value; }
-        }
-        public double UsernameWidth
-        {
-            get { return _options.UsernameWidth; }
-            set { _options.UsernameWidth = value; }
-        }
-        public bool IsShowUsername
-        {
-            get { return _options.IsShowUsername; }
-            set { _options.IsShowUsername = value; }
-        }
-        #endregion
-
-        #region UserId
-        public int UserIdDisplayIndex
-        {
-            get { return _options.UserIdDisplayIndex; }
-            set { _options.UserIdDisplayIndex = value; }
-        }
-        public double UserIdWidth
-        {
-            get { return _options.UserIdWidth; }
-            set { _options.UserIdWidth = value; }
-        }
-        public bool IsShowUserId
-        {
-            get { return _options.IsShowUserId; }
-            set { _options.IsShowUserId = value; }
-        }
-        #endregion
-
-        #region PostTime
-        public int PostTimeDisplayIndex
-        {
-            get { return _options.PostTimeDisplayIndex; }
-            set { _options.PostTimeDisplayIndex = value; }
-        }
-        public double PostTimeWidth
-        {
-            get { return _options.PostTimeWidth; }
-            set { _options.PostTimeWidth = value; }
-        }
-        public bool IsShowPostTime
-        {
-            get { return _options.IsShowPostTime; }
-            set { _options.IsShowPostTime = value; }
-        }
-        #endregion
-
-        #region Message
-        public int MessageDisplayIndex
-        {
-            get { return _options.MessageDisplayIndex; }
-            set { _options.MessageDisplayIndex = value; }
-        }
-        public double MessageWidth
-        {
-            get { return _options.MessageWidth; }
-            set { _options.MessageWidth = value; }
-        }
-        #endregion
-
-        //public bool IsShowCommentId
-        //{
-        //    get { return _options.IsShowCommentId; }
-        //    set { _options.IsShowCommentId = value; }
-        //}
-
-        public Color SelectedRowBackColor
-        {
-            get { return _options.SelectedRowBackColor; }
-        }
-        public Color SelectedRowForeColor
-        {
-            get { return _options.SelectedRowForeColor; }
-        }
-        public System.Windows.Controls.ScrollUnit ScrollUnit
-        {
-            get
-            {
-                if (_options.IsPixelScrolling)
-                {
-                    return System.Windows.Controls.ScrollUnit.Pixel;
-                }
-                else
-                {
-                    return System.Windows.Controls.ScrollUnit.Item;
-                }
-            }
-        }
-        public IValueConverter ThumbnailConverter { get; } = new Common.Wpf.ThumbnailConverter();
 
         private string GetSiteOptionsPath(ISiteContext site)
         {
@@ -327,7 +218,7 @@ namespace YouTubeLiveCommentViewer.ViewModel
             _canClose = true;
             App.Current.Shutdown();
         }
-        void SetInfo(string message, InfoType type)
+        protected override void SetInfo(string message, InfoType type)
         {
             var cvm = new InfoCommentViewModel(_options, message, type);
             AddComment(cvm);
@@ -422,7 +313,7 @@ namespace YouTubeLiveCommentViewer.ViewModel
         }
         private readonly IYouTubeSiteContext _siteContext;
 
-        public MainViewModel()
+        public MainViewModel():base(new DynamicOptionsTest())
         {
 
         }
@@ -470,20 +361,12 @@ namespace YouTubeLiveCommentViewer.ViewModel
             }
         }
         #endregion //LiveTitle
-
-        public Brush HorizontalGridLineBrush
-        {
-            get { return new SolidColorBrush(_options.HorizontalGridLineColor); }
-        }
-        public Brush VerticalGridLineBrush
-        {
-            get { return new SolidColorBrush(_options.HorizontalGridLineColor); }
-        }
-
+        
         ICommentProvider _commentProvider;
         IOptions _options;
         [GalaSoft.MvvmLight.Ioc.PreferredConstructor]
         internal MainViewModel(IYouTubeSiteContext siteContext, IOptions options, IIo io, ILogger logger)
+            :base(options)
         {
             _dispatcher = Dispatcher.CurrentDispatcher;
             _siteContext = siteContext;
@@ -503,8 +386,8 @@ namespace YouTubeLiveCommentViewer.ViewModel
             DisconnectCommand = new RelayCommand(Disconnect);
             ShowUserInfoCommand = new RelayCommand(ShowUserInfo);
 
-            OpenUrlCommand = new RelayCommand(OpenUrl);
-            CommentCopyCommand = new RelayCommand(CopyComment);
+            Comments = CollectionViewSource.GetDefaultView(_comments);
+
             options.PropertyChanged += (s, e) =>
             {
                 switch (e.PropertyName)
@@ -528,72 +411,7 @@ namespace YouTubeLiveCommentViewer.ViewModel
                 }
             };
         }
-        private void OpenUrl()
-        {
-            var text = SelectedComment.MessageItems.ToText();
-            var list = ExtractUrl(text);
-            if (list.Count > 0)
-            {
-                Process.Start(list[0]);
-            }
-        }
-        public bool ContainsUrl
-        {
-            get
-            {
-                if (SelectedComment == null)
-                    return false;
-                var text = SelectedComment.MessageItems.ToText();
-                var list = ExtractUrl(text);
-                return list.Count > 0;
-            }
-        }
-        private void CopyComment()
-        {
-            var items = SelectedComment.MessageItems;
 
-            var strs = items.Where(a => a is IMessageText).Cast<IMessageText>().Select(b => b.Text);
-            var str = string.Join("", strs);
-            try
-            {
-                Clipboard.SetText(str);
-            }
-            catch (System.Runtime.InteropServices.COMException ex)
-            {
-
-                SetInfo("クリップボードのオープンに失敗しました。", InfoType.Error);
-            }
-        }
-        /// <summary>
-        /// 文字列からURLを抽出する
-        /// </summary>
-        /// <param name="str"></param>
-        /// <returns></returns>
-        public static List<string> ExtractUrl(string str)
-        {
-            const string urlPattern = @"(?:h?ttps?://|www\.)\S+";
-            var matches = Regex.Matches(str, urlPattern, RegexOptions.Compiled | RegexOptions.Singleline);
-            var list = new List<string>();
-            foreach (Match match in matches)
-            {
-                list.Add(match.Groups[0].Value);
-            }
-            return list;
-        }
-        public ICommentViewModel SelectedComment
-        {
-            get
-            {
-                return _selectedComment;
-            }
-            set
-            {
-                if (_selectedComment == value)
-                    return;
-                _selectedComment = value;
-                RaisePropertyChanged(nameof(ContainsUrl));
-            }
-        }
         private void ShowUserInfo()
         {
             var current = SelectedComment;
@@ -607,7 +425,7 @@ namespace YouTubeLiveCommentViewer.ViewModel
                     Debug.WriteLine("UserIdがnull");
                     return;
                 }
-                var view = new CollectionViewSource { Source = Comments }.View;
+                var view = new CollectionViewSource { Source = _comments }.View;
                 view.Filter = obj =>
                 {
                     if (!(obj is YouTubeLiveCommentViewModel cvm))
@@ -678,7 +496,7 @@ namespace YouTubeLiveCommentViewer.ViewModel
             }
         }
         public ObservableCollection<PluginMenuItemViewModel> PluginMenuItemCollection { get; } = new ObservableCollection<PluginMenuItemViewModel>();
-        public ObservableCollection<ICommentViewModel> Comments { get; } = new ObservableCollection<ICommentViewModel>();
+        private ObservableCollection<ICommentViewModel> _comments { get; } = new ObservableCollection<ICommentViewModel>();
         private void AddComment(ICommentViewModel cvm)
         {
             if (cvm is IInfoCommentViewModel info && info.Type > _options.ShowingInfoLevel)
@@ -687,11 +505,11 @@ namespace YouTubeLiveCommentViewer.ViewModel
             }
             if (_isAddingNewCommentTop)
             {
-                Comments.Insert(0, cvm);
+                _comments.Insert(0, cvm);
             }
             else
             {
-                Comments.Add(cvm);
+                _comments.Add(cvm);
             }
         }
         private void CommentProvider_CommentReceived(object sender, ICommentViewModel e)
@@ -711,7 +529,6 @@ namespace YouTubeLiveCommentViewer.ViewModel
         }
         bool IsValidInput { get; set; }
         private string _input;
-        private ICommentViewModel _selectedComment;
 
         public string Input
         {
@@ -729,7 +546,7 @@ namespace YouTubeLiveCommentViewer.ViewModel
         {
             var selectedBrowser = SelectedBrowserViewModel.Browser;
             var input = Input;
-            Comments.Clear();
+            _comments.Clear();
             try
             {
                 await _commentProvider.ConnectAsync(input, selectedBrowser);
