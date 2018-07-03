@@ -28,9 +28,6 @@ namespace YouTubeLiveCommentViewer
     /// </summary>
     public abstract class CommentDataGridViewModelBase : ViewModelBase
     {
-        public ICommand CommentCopyCommand { get; }
-        public ICommand OpenUrlCommand { get; }
-
         public ICollectionView Comments { get; protected set; }
         public System.Windows.Controls.ScrollUnit ScrollUnit
         {
@@ -182,62 +179,10 @@ namespace YouTubeLiveCommentViewer
                 if (_selectedComment == value)
                     return;
                 _selectedComment = value;
-                RaisePropertyChanged(nameof(ContainsUrl));
             }
         }
         #endregion
-        /// <summary>
-        /// 文字列からURLを抽出する
-        /// </summary>
-        /// <param name="str"></param>
-        /// <returns></returns>
-        public static List<string> ExtractUrl(string str)
-        {
-            const string urlPattern = @"(?:h?ttps?://|www\.)\S+";
-            var matches = Regex.Matches(str, urlPattern, RegexOptions.Compiled | RegexOptions.Singleline);
-            var list = new List<string>();
-            foreach (Match match in matches)
-            {
-                list.Add(match.Groups[0].Value);
-            }
-            return list;
-        }
-        private void OpenUrl()
-        {
-            var text = SelectedComment.MessageItems.ToText();
-            var list = ExtractUrl(text);
-            if (list.Count > 0)
-            {
-                Process.Start(list[0]);
-            }
-        }
-        public bool ContainsUrl
-        {
-            get
-            {
-                if (SelectedComment == null)
-                    return false;
-                var text = SelectedComment.MessageItems.ToText();
-                var list = ExtractUrl(text);
-                return list.Count > 0;
-            }
-        }
-        private void CopyComment()
-        {
-            var items = SelectedComment.MessageItems;
 
-            var strs = items.Where(a => a is IMessageText).Cast<IMessageText>().Select(b => b.Text);
-            var str = string.Join("", strs);
-            try
-            {
-                Clipboard.SetText(str);
-            }
-            catch (System.Runtime.InteropServices.COMException ex)
-            {
-
-                SetInfo("クリップボードのオープンに失敗しました。", InfoType.Error);
-            }
-        }
         protected virtual void SetInfo(string message, InfoType type)
         {
             Debug.WriteLine(message);
@@ -261,8 +206,8 @@ namespace YouTubeLiveCommentViewer
                         break;
                 }
             };
-            OpenUrlCommand = new RelayCommand(OpenUrl);
-            CommentCopyCommand = new RelayCommand(CopyComment);
         }
+
+
     }
 }
