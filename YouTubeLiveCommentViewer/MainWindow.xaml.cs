@@ -118,41 +118,6 @@ namespace YouTubeLiveCommentViewer.View
                 }
             });
         }
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        /// https://social.msdn.microsoft.com/Forums/vstudio/en-US/63fa1e10-1050-4448-a2bc-62dfe0836f25/selecting-datagrid-row-when-right-mouse-button-is-pressed?forum=wpf
-        private void DataGrid_MouseRightButtonUp(object sender, MouseButtonEventArgs e)
-        {
-            DependencyObject dep = (DependencyObject)e.OriginalSource;
-
-            //depがRunだと、VisualTreeHelper.GetParent()で下記の例外が投げられてしまう。
-            //'System.Windows.Documents.Run' is not a Visual or Visual3D' InvalidOperationException
-            if (e.OriginalSource is Run run)
-            {
-                dep = run.Parent;
-            }
-            while ((dep != null) && !(dep is DataGridCell))
-            {
-                dep = VisualTreeHelper.GetParent(dep);
-            }
-            if (dep == null) return;
-
-            if (dep is DataGridCell)
-            {
-                DataGridCell cell = dep as DataGridCell;
-                cell.Focus();
-
-                while ((dep != null) && !(dep is DataGridRow))
-                {
-                    dep = VisualTreeHelper.GetParent(dep);
-                }
-                DataGridRow row = dep as DataGridRow;
-                dataGrid.SelectedItem = row.DataContext;
-            }
-        }
 
         //protected override void OnMouseRightButtonUp(MouseButtonEventArgs e)
         //{

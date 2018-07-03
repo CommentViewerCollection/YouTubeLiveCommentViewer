@@ -18,6 +18,8 @@ using System.Windows.Media;
 using System.ComponentModel;
 using System.Windows.Data;
 using System.Windows;
+using System.Text.RegularExpressions;
+using Common;
 
 namespace YouTubeLiveCommentViewer
 {
@@ -26,7 +28,7 @@ namespace YouTubeLiveCommentViewer
     /// </summary>
     public abstract class CommentDataGridViewModelBase : ViewModelBase
     {
-        public ICollectionView Comments { get; }
+        public ICollectionView Comments { get; protected set; }
         public System.Windows.Controls.ScrollUnit ScrollUnit
         {
             get
@@ -63,7 +65,7 @@ namespace YouTubeLiveCommentViewer
         public abstract bool IsShowThumbnailMenuItem { get; }
         public abstract bool IsShowUsernameMenuItem { get; }
         public abstract bool IsShowUserIdMenuItem { get; }
-        #region サムネ
+        #region Thumbnail
         public double ThumbnailWidth
         {
             get { return _options.ThumbnailWidth; }
@@ -80,6 +82,13 @@ namespace YouTubeLiveCommentViewer
             set { _options.ThumbnailDisplayIndex = value; }
         }
         #endregion
+
+        #region Username
+        public int UsernameDisplayIndex
+        {
+            get { return _options.UsernameDisplayIndex; }
+            set { _options.UsernameDisplayIndex = value; }
+        }
         public double UsernameWidth
         {
             get { return _options.UsernameWidth; }
@@ -90,11 +99,8 @@ namespace YouTubeLiveCommentViewer
             get { return _options.IsShowUsername; }
             set { _options.IsShowUsername = value; }
         }
-        public int UsernameDisplayIndex
-        {
-            get { return _options.UsernameDisplayIndex; }
-            set { _options.UsernameDisplayIndex = value; }
-        }
+        #endregion
+
         #region UserId
         public int UserIdDisplayIndex
         {
@@ -130,6 +136,8 @@ namespace YouTubeLiveCommentViewer
             set { _options.IsShowPostTime = value; }
         }
         #endregion
+
+        #region Message
         public double MessageWidth
         {
             get { return _options.MessageWidth; }
@@ -145,6 +153,8 @@ namespace YouTubeLiveCommentViewer
             get { return _options.MessageDisplayIndex; }
             set { _options.MessageDisplayIndex = value; }
         }
+        #endregion
+
         public Color SelectedRowBackColor
         {
             get { return _options.SelectedRowBackColor; }
@@ -155,7 +165,28 @@ namespace YouTubeLiveCommentViewer
             get { return _options.SelectedRowForeColor; }
             set { _options.SelectedRowForeColor = value; }
         }
-        public ICommentViewModel SelectedComment { get; set; }
+
+        #region SelectedComment
+        private ICommentViewModel _selectedComment;
+        public ICommentViewModel SelectedComment
+        {
+            get
+            {
+                return _selectedComment;
+            }
+            set
+            {
+                if (_selectedComment == value)
+                    return;
+                _selectedComment = value;
+            }
+        }
+        #endregion
+
+        protected virtual void SetInfo(string message, InfoType type)
+        {
+            Debug.WriteLine(message);
+        }
         private readonly IOptions _options;
 
         public CommentDataGridViewModelBase(IOptions options)
@@ -176,5 +207,7 @@ namespace YouTubeLiveCommentViewer
                 }
             };
         }
+
+
     }
 }
