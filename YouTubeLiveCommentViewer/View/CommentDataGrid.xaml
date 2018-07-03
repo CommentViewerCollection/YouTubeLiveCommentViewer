@@ -52,11 +52,13 @@
                 <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="{Binding SelectedRowForeColor}" />
                 <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="{Binding SelectedRowBackColor}"/>
                 <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightTextBrushKey}" Color="{Binding SelectedRowForeColor}"/>
-                <ContextMenu x:Key="commentContext" DataContext="{Binding DataContext, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}}">
+                <ContextMenu x:Key="commentContext">
                     <MenuItem Header="コメントをコピー" Command="{Binding CommentCopyCommand}" />
+                    <MenuItem Header="ユーザ名をコピー" Command="{Binding UsernameCopyCommand}" />
+                    <MenuItem Header="コテハンをコピー" IsEnabled="{Binding HasNickname}" Command="{Binding NicknameCopyCommand}" />
                     <MenuItem Header="URLを開く" IsEnabled="{Binding ContainsUrl}" Command="{Binding OpenUrlCommand}" />
-                    <Separator Visibility="{Binding IsShowUserInfoMenuItem, Converter={StaticResource booleanToVisibilityConverter}}" />
-                    <MenuItem x:Name="UserInfoMenuItem" Header="ユーザ情報" Command="{Binding ShowUserInfoCommand}" Visibility="{Binding IsShowUserInfoMenuItem, Converter={StaticResource booleanToVisibilityConverter}}" />
+                    <Separator Visibility="{Binding IsShowUserInfoMenuItem, Converter={StaticResource booleanToVisibilityConverter}}" DataContext="{Binding DataContext, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type UserControl}}}" />
+                    <MenuItem x:Name="UserInfoMenuItem" Header="ユーザ情報" DataContext="{Binding DataContext, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type UserControl}}}" Command="{Binding ShowUserInfoCommand}" Visibility="{Binding IsShowUserInfoMenuItem, Converter={StaticResource booleanToVisibilityConverter}}" />
                 </ContextMenu>
                 <Style TargetType="{x:Type DataGridRow}">
                     <Setter Property="FontFamily" Value="{Binding FontFamily}" />
