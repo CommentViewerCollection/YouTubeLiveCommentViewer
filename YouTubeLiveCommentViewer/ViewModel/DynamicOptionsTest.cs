@@ -62,6 +62,7 @@ namespace YouTubeLiveCommentViewer
         public bool IsAddingNewCommentTop { get => GetValue(); set => SetValue(value); }
         public bool IsPixelScrolling { get => GetValue(); set => SetValue(value); }
         public InfoType ShowingInfoLevel { get => GetValue(); set => SetValue(value); }
+        public string Input { get => GetValue(); set => SetValue(value); }
         protected override void Init()
         {
             Dict.Add(nameof(FontFamily), new Item { DefaultValue = new FontFamily("メイリオ, Meiryo"), Predicate = f => true, Serializer = f => FontFamilyToString(f), Deserializer = s => FontFamilyFromString(s) });
@@ -123,6 +124,7 @@ namespace YouTubeLiveCommentViewer
 #else
             Dict.Add(nameof(ShowingInfoLevel), new Item { DefaultValue = InfoType.Notice, Predicate = b => true, Serializer = b => b.ToString(), Deserializer = s => bool.Parse(s) });
 #endif
+            Dict.Add(nameof(Input), new Item { DefaultValue = string.Empty, Predicate = b => true, Serializer = s => s, Deserializer = s => s });
             //以下使わないけど、IOptionsに要求される
             //Dict.Add(nameof(ConnectionNameWidth), new Item { DefaultValue = 100, Predicate = n => n > 0, Serializer = n => n.ToString(), Deserializer = s => double.Parse(s) });
             //Dict.Add(nameof(CommentIdWidth), new Item { DefaultValue = 100, Predicate = n => n > 0, Serializer = n => n.ToString(), Deserializer = s => double.Parse(s) });
