@@ -150,6 +150,7 @@ namespace YouTubeLiveCommentViewer.ViewModel
                 var siteOptionsPath = GetSiteOptionsPath(_siteContext);
                 _siteContext.LoadOptions(siteOptionsPath, _io);
                 _commentProvider = _siteContext.CreateCommentProvider();
+                _commentProvider.Connected += CommentProvider_Connected;
                 _commentProvider.InitialCommentsReceived += CommentProvider_InitialCommentsReceived;
                 _commentProvider.CommentReceived += CommentProvider_CommentReceived;
                 _commentProvider.MetadataUpdated += CommentProvider_MetadataUpdated;
@@ -186,6 +187,8 @@ namespace YouTubeLiveCommentViewer.ViewModel
 
                 _pluginManager.OnLoaded();
 
+                Input = _options.Input;
+
                 if (_options.IsAutoCheckIfUpdateExists)
                 {
                     await CheckIfUpdateExists(true);
@@ -197,6 +200,12 @@ namespace YouTubeLiveCommentViewer.ViewModel
                 Debug.WriteLine(ex.Message);
             }
         }
+
+        private void CommentProvider_Connected(object sender, ConnectedEventArgs e)
+        {
+            _options.Input = e.IsInputStoringNeeded ? Input : "";
+        }
+
         bool _canClose = false;
         private async void Closing(CancelEventArgs e)
         {
@@ -538,6 +547,7 @@ namespace YouTubeLiveCommentViewer.ViewModel
                 if (_input == value) return;
                 _input = value;
                 IsValidInput = _siteContext.IsValidInput(_input);
+                RaisePropertyChanged();
                 RaisePropertyChanged(nameof(CanConnect));
                 RaisePropertyChanged(nameof(CanDisconnect));
             }
