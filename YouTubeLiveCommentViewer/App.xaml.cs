@@ -22,6 +22,7 @@ namespace YouTubeLiveCommentViewer
         DynamicOptionsTest options;
         IOTest io;
         ILogger _logger;
+        YouTubeLiveSiteContext _siteContext;
         private string GetOptionsPath()
         {
             return @"settings\options.txt";
@@ -58,9 +59,9 @@ namespace YouTubeLiveCommentViewer
             }
             catch { }
 
-            var siteContext = new YouTubeLiveSiteContext(options,new YouTubeLiveServer(), _logger, new UserStoreTest());
-
-            var vm = new ViewModel.MainViewModel(siteContext, options, io, _logger);
+            _siteContext = new YouTubeLiveSiteContext(options,new YouTubeLiveServer(), _logger);
+            _siteContext.Init();
+            var vm = new ViewModel.MainViewModel(_siteContext, options, io, _logger);
             var resource = Application.Current.Resources;
             var locator = resource["Locator"] as ViewModel.ViewModelLocator;
             locator.Main = vm;
@@ -74,6 +75,14 @@ namespace YouTubeLiveCommentViewer
             {
                 var s = options.Serialize();
                 io.WriteFile(GetOptionsPath(), s);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogException(ex);
+            }
+            try
+            {
+                _siteContext.Save();
             }
             catch (Exception ex)
             {
