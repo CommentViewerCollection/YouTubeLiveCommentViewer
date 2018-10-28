@@ -229,7 +229,7 @@ namespace YouTubeLiveCommentViewer.ViewModel
         }
         protected override void SetInfo(string message, InfoType type)
         {
-            var cvm = new InfoCommentViewModel(_options, message, type);
+            var cvm = new SystemInfoCommentViewModel(_options, message, type);
             AddComment(cvm);
         }
         private async Task CheckIfUpdateExists(bool isAutoCheck)
@@ -531,10 +531,14 @@ namespace YouTubeLiveCommentViewer.ViewModel
             {
                 Debug.WriteLine(ex.Message);
             }
-            if (!e.IsInfo)
+            if (IsComment(e.MessageType))
             {
                 _pluginManager.SetComments(e);
             }
+        }
+        bool IsComment(MessageType type)
+        {
+            return !(type == MessageType.SystemInfo || type == MessageType.BroadcastInfo);
         }
         bool IsValidInput { get; set; }
         private string _input;

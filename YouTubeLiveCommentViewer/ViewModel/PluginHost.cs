@@ -1,5 +1,6 @@
 ﻿using SitePlugin;
 using Plugin;
+using System.Collections.Generic;
 
 namespace YouTubeLiveCommentViewer.ViewModel
 {
@@ -21,6 +22,21 @@ namespace YouTubeLiveCommentViewer.ViewModel
         public void SaveOptions(string path, string s)
         {
             _io.WriteFile(path, s);
+        }
+
+        public void PostCommentToAll(string comment)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public void PostComment(string guid, string comment)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public IEnumerable<IConnectionStatus> GetAllConnectionStatus()
+        {
+            throw new System.NotImplementedException();
         }
 
         private readonly MainViewModel _vm;
