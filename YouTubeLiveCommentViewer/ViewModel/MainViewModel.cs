@@ -530,10 +530,18 @@ namespace YouTubeLiveCommentViewer.ViewModel
             catch (Exception ex)
             {
                 Debug.WriteLine(ex.Message);
+                _logger.LogException(ex);
             }
-            if (IsComment(e.MessageType))
+            try
             {
-                _pluginManager.SetComments(e);
+                if (IsComment(e.MessageType))
+                {
+                    _pluginManager.SetComments(e);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogException(ex);
             }
         }
         bool IsComment(MessageType type)
@@ -550,7 +558,14 @@ namespace YouTubeLiveCommentViewer.ViewModel
             {
                 if (_input == value) return;
                 _input = value;
-                IsValidInput = _siteContext.IsValidInput(_input);
+                try
+                {
+                    IsValidInput = _siteContext.IsValidInput(_input);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogException(ex);
+                }
                 RaisePropertyChanged();
                 RaisePropertyChanged(nameof(CanConnect));
                 RaisePropertyChanged(nameof(CanDisconnect));
