@@ -11,6 +11,7 @@ using System.Diagnostics;
 using System;
 using System.Net.Http;
 using System.Text;
+using CommentViewerCommon;
 
 namespace YouTubeLiveCommentViewer
 {
@@ -19,8 +20,8 @@ namespace YouTubeLiveCommentViewer
     /// </summary>
     public partial class App : Application
     {
-        DynamicOptionsTest options;
-        IOTest io;
+        DynamicOptionsTest _options;
+        IOTest _io;
         ILogger _logger;
         YouTubeLiveSiteContext _siteContext;
         private string GetOptionsPath()
@@ -31,13 +32,13 @@ namespace YouTubeLiveCommentViewer
         {
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
             base.OnStartup(e);
-            io = new IOTest();
+            _io = new IOTest();
             _logger = new LoggerTest();
-            options = new DynamicOptionsTest();
+            _options = new DynamicOptionsTest();
             try
             {
-                var s = io.ReadFile(GetOptionsPath());
-                options.Deserialize(s);
+                var s = _io.ReadFile(GetOptionsPath());
+                _options.Deserialize(s);
             }
             catch (Exception ex)
             {
@@ -59,9 +60,10 @@ namespace YouTubeLiveCommentViewer
             }
             catch { }
 
-            _siteContext = new YouTubeLiveSiteContext(options,new YouTubeLiveServer(), _logger);
+            _siteContext = new YouTubeLiveSiteContext(_options,new YouTubeLiveServer(), _logger);
             _siteContext.Init();
-            var vm = new ViewModel.MainViewModel(_siteContext, options, io, _logger);
+            var browserLoader = new BrowserLoader(_logger);
+            var vm = new ViewModel.MainViewModel(_siteContext, _options, _io, _logger, browserLoader);
             var resource = Application.Current.Resources;
             var locator = resource["Locator"] as ViewModel.ViewModelLocator;
             locator.Main = vm;
@@ -73,8 +75,8 @@ namespace YouTubeLiveCommentViewer
         {
             try
             {
-                var s = options.Serialize();
-                io.WriteFile(GetOptionsPath(), s);
+                var s = _options.Serialize();
+                _io.WriteFile(GetOptionsPath(), s);
             }
             catch (Exception ex)
             {

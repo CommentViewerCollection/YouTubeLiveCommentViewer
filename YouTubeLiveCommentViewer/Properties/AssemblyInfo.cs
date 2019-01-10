@@ -10,9 +10,9 @@ using System.Windows;
 [assembly: AssemblyTitle("YouTubeLiveCommentViewer")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("ryu-s")]
 [assembly: AssemblyProduct("YouTubeLiveCommentViewer")]
-[assembly: AssemblyCopyright("Copyright ©  2018")]
+[assembly: AssemblyCopyright("Copyright © ryu-s  2018")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -51,5 +51,5 @@ using System.Windows;
 // You can specify all the values or you can default the Build and Revision Numbers
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("0.3.20")]
-[assembly: AssemblyFileVersion("0.3.20.0")]
+[assembly: AssemblyVersion("0.3.21")]
+[assembly: AssemblyFileVersion("0.3.21.0")]

@@ -19,6 +19,7 @@ using System.Windows.Media;
 using System.Windows.Data;
 using System.Text.RegularExpressions;
 using System.Windows;
+using CommentViewerCommon;
 
 namespace YouTubeLiveCommentViewer.ViewModel
 {
@@ -374,12 +375,12 @@ namespace YouTubeLiveCommentViewer.ViewModel
         ICommentProvider _commentProvider;
         IOptions _options;
         [GalaSoft.MvvmLight.Ioc.PreferredConstructor]
-        internal MainViewModel(IYouTubeSiteContext siteContext, IOptions options, IIo io, ILogger logger)
+        internal MainViewModel(IYouTubeSiteContext siteContext, IOptions options, IIo io, ILogger logger, IBrowserLoader browserLoader)
             :base(options)
         {
             _dispatcher = Dispatcher.CurrentDispatcher;
             _siteContext = siteContext;
-            _browserLoader = new BrowserLoader(logger);
+            _browserLoader = browserLoader;
             _options = options;
             _io = io;
             _logger = logger;

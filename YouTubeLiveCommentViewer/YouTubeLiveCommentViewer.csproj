@@ -215,6 +215,14 @@
       <Project>{d3fd476c-9801-4861-8fa1-c3d57ff30c83}</Project>
       <Name>YouTubeLiveSitePlugin</Name>
     </ProjectReference>
+    <ProjectReference Include="$(SolutionDir)\CommentViewerCommon\CommentViewerCommon\CommentViewerCommon.csproj">
+      <Project>{18a7a590-4c58-4755-a24c-6eda52e0c3eb}</Project>
+      <Name>CommentViewerCommon</Name>
+    </ProjectReference>
+    <ProjectReference Include="$(SolutionDir)\SitePluginCommon\SitePluginCommon\SitePluginCommon.csproj">
+      <Project>{aaf4779f-f8bf-4794-a6e8-4ed88a8b6b68}</Project>
+      <Name>SitePluginCommon</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
