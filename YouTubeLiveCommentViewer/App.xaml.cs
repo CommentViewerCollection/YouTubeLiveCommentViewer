@@ -11,6 +11,7 @@ using System.Diagnostics;
 using System;
 using System.Net.Http;
 using System.Text;
+using CommentViewerCommon;
 
 namespace YouTubeLiveCommentViewer
 {
@@ -61,7 +62,8 @@ namespace YouTubeLiveCommentViewer
 
             _siteContext = new YouTubeLiveSiteContext(options,new YouTubeLiveServer(), _logger);
             _siteContext.Init();
-            var vm = new ViewModel.MainViewModel(_siteContext, options, io, _logger);
+            var browserLoader = new BrowserLoader(_logger);
+            var vm = new ViewModel.MainViewModel(_siteContext, options, io, _logger, browserLoader);
             var resource = Application.Current.Resources;
             var locator = resource["Locator"] as ViewModel.ViewModelLocator;
             locator.Main = vm;
