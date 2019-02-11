@@ -501,9 +501,21 @@ namespace YouTubeLiveCommentViewer.ViewModel
         {
             var message = e.Message;
             YouTubeLiveCommentViewModel cvm = null;
-            if(message is YouTubeLiveComment comment)
+            if(message is IYouTubeLiveComment comment)
             {
                 cvm = new YouTubeLiveCommentViewModel(comment, e.Metadata, e.Methods);
+            }
+            else if (message is IYouTubeLiveSuperchat superchat)
+            {
+                cvm = new YouTubeLiveCommentViewModel(superchat, e.Metadata, e.Methods);
+            }
+            else if (message is IYouTubeLiveConnected connected)
+            {
+                cvm = new YouTubeLiveCommentViewModel(connected, e.Metadata, e.Methods);
+            }
+            else if (message is IYouTubeLiveDisconnected disconnected)
+            {
+                cvm = new YouTubeLiveCommentViewModel(disconnected, e.Metadata, e.Methods);
             }
             if (cvm != null)
             {
