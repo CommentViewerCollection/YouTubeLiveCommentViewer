@@ -5,11 +5,20 @@ using System;
 using System.Windows.Media;
 using System.Windows;
 using System.ComponentModel;
+using System.Diagnostics;
+using System.Text.RegularExpressions;
+using System.Windows.Input;
+using GalaSoft.MvvmLight.CommandWpf;
 
 namespace YouTubeLiveCommentViewer.ViewModel
 {
     public class YouTubeLiveCommentViewModel : IYouTubeLiveCommentViewModel
     {
+        public ICommand CommentCopyCommand { get; }
+        public ICommand OpenUrlCommand { get; }
+        public ICommand UsernameCopyCommand { get; }
+        public ICommand NicknameCopyCommand { get; }
+
         private readonly YouTubeLiveSitePlugin.IYouTubeLiveMessage _message;
         private readonly IMessageMetadata _metadata;
         private readonly IMessageMethods _methods;
@@ -67,6 +76,10 @@ namespace YouTubeLiveCommentViewer.ViewModel
                 };
                 SetNickname(user);
             }
+            CommentCopyCommand = new RelayCommand(CopyComment);
+            OpenUrlCommand = new RelayCommand(OpenUrl);
+            UsernameCopyCommand = new RelayCommand(CopyUsername);
+            NicknameCopyCommand = new RelayCommand(CopyNickname);
         }
         public YouTubeLiveCommentViewModel(YouTubeLiveSitePlugin.IYouTubeLiveComment comment, IMessageMetadata metadata, IMessageMethods methods)
             : this(metadata, methods)
@@ -165,6 +178,68 @@ namespace YouTubeLiveCommentViewer.ViewModel
                 return TextWrapping.NoWrap;
             }
         }
+        public bool ContainsUrl
+        {
+            get
+            {
+                return !string.IsNullOrEmpty(GetUrlFromSelectedComment());
+            }
+        }
+        public bool HasNickname
+        {
+            get
+            {
+                return _nickItems != null;
+            }
+        }
+        private string GetUrlFromSelectedComment()
+        {
+            var message = MessageItems.ToText();
+            var match = Regex.Match(message, "(https?://([\\w-]+.)+[\\w-]+(?:/[\\w- ./?%&=]))?");
+            if (match.Success)
+            {
+                return match.Groups[1].Value;
+            }
+            return null;
+        }
+        private void OpenUrl()
+        {
+            var url = GetUrlFromSelectedComment();
+            Process.Start(url);
+            //SetSystemInfo("open: " + url, InfoType.Debug);
+        }
+        private void CopyNickname()
+        {
+            var username = _nickItems?.ToText();
+            if(string.IsNullOrEmpty(username))
+            {
+                return;
+            }
+            try
+            {
+                System.Windows.Clipboard.SetText(username);
+            }
+            catch (System.Runtime.InteropServices.COMException) { }
+        }
+        private void CopyUsername()
+        {
+            var username = _nameItems.ToText();
+            try
+            {
+                System.Windows.Clipboard.SetText(username);
+            }
+            catch (System.Runtime.InteropServices.COMException) { }
+        }
+        private void CopyComment()
+        {
+            var message = MessageItems.ToText();
+            try
+            {
+                System.Windows.Clipboard.SetText(message);
+            }
+            catch (System.Runtime.InteropServices.COMException) { }
+            //SetSystemInfo("copy: " + message, InfoType.Debug);
+        }
         #region INotifyPropertyChanged
         [NonSerialized]
         private System.ComponentModel.PropertyChangedEventHandler _propertyChanged;
@@ -185,5 +260,42 @@ namespace YouTubeLiveCommentViewer.ViewModel
             _propertyChanged?.Invoke(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
         }
         #endregion
+    }
+    static class MessageParts
+    {
+        public static string ToText(this IEnumerable<IMessagePart> parts)
+        {
+            string s = "";
+            if (parts != null)
+            {
+                foreach (var part in parts)
+                {
+                    if (part is IMessageText text)
+                    {
+                        s += text;
+                    }
+                }
+            }
+            return s;
+        }
+        public static string ToTextWithImageAlt(this IEnumerable<IMessagePart> parts)
+        {
+            string s = "";
+            if (parts != null)
+            {
+                foreach (var part in parts)
+                {
+                    if (part is IMessageText text)
+                    {
+                        s += text;
+                    }
+                    else if (part is IMessageImage image)
+                    {
+                        s += image.Alt;
+                    }
+                }
+            }
+            return s;
+        }
     }
 }
