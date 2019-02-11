@@ -527,14 +527,14 @@ namespace YouTubeLiveCommentViewer.ViewModel
                 {
                     _comments.Add(cvm);
                 }
-                try
-                {
-                    _pluginManager.SetMessage(message, e.Metadata);
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogException(ex);
-                }
+            }
+            try
+            {
+                _pluginManager.SetMessage(message, e.Metadata);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogException(ex);
             }
         }
         private void AddComment(ICommentViewModel cvm)
