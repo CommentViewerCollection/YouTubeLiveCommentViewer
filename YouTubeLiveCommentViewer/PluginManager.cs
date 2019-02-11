@@ -122,6 +122,14 @@ namespace YouTubeLiveCommentViewer
             }
         }
 
+        public void SetMessage(IMessage message, IMessageMetadata messageMetadata)
+        {
+            foreach (var plugin in _plugins)
+            {
+                plugin.OnMessageReceived(message, messageMetadata);
+            }
+        }
+
         private readonly IOptions _options;
         public PluginManager(IOptions options)
         {

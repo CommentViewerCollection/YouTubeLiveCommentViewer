@@ -21,7 +21,7 @@
         <CheckBox x:Name="checkBox" Content="新しいコメントを上に追加する" IsChecked="{Binding IsAddingNewCommentTop}" HorizontalAlignment="Left" Margin="23,225,0,0" VerticalAlignment="Top"/>
         <Label x:Name="label7" Content="変更後、コメビュを再起動してください" Foreground="Red" HorizontalAlignment="Left" Margin="196,219,0,0" VerticalAlignment="Top"/>
 
-        <CheckBox Content="名前が長くて表示しきれない時は折り返す" IsChecked="{Binding IsUserNameWrapping}" HorizontalAlignment="Left" Margin="22,205,0,0" VerticalAlignment="Top"/>
+        <CheckBox Content="名前が長くて表示しきれない時は折り返す" IsEnabled="False" IsChecked="{Binding IsUserNameWrapping}" HorizontalAlignment="Left" Margin="22,205,0,0" VerticalAlignment="Top"/>
         <xctk:ColorPicker  SelectedColor="{Binding SelectedRowBackColor}" Margin="134,116,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" RenderTransformOrigin="0.32,0.045" />
         <xctk:ColorPicker  SelectedColor="{Binding SelectedRowForeColor}" Margin="134,147,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" />
         <Label x:Name="label10" Content="選択行の背景色" HorizontalAlignment="Left" Margin="37,112,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.163,0.462"/>

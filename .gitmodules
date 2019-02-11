@@ -28,3 +28,9 @@
 [submodule "SitePluginCommon"]
 	path = SitePluginCommon
 	url = git@github.com:CommentViewerCollection/SitePluginCommon.git
+[submodule "YouTubeLiveIF"]
+	path = YouTubeLiveIF
+	url = git@github.com:CommentViewerCollection/YouTubeLiveIF.git
+[submodule "BouyomiPlugin_YouTubeLive"]
+	path = BouyomiPlugin_YouTubeLive
+	url = git@github.com:CommentViewerCollection/BouyomiPlugin_YouTubeLive.git

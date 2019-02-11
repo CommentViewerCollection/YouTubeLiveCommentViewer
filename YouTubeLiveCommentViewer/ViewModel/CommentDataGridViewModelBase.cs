@@ -167,8 +167,8 @@ namespace YouTubeLiveCommentViewer
         }
 
         #region SelectedComment
-        private ICommentViewModel _selectedComment;
-        public ICommentViewModel SelectedComment
+        private IYouTubeLiveCommentViewModel _selectedComment;
+        public IYouTubeLiveCommentViewModel SelectedComment
         {
             get
             {
