@@ -15,10 +15,8 @@ using System.Diagnostics;
 using System.ComponentModel;
 using GalaSoft.MvvmLight.Command;
 using System.Collections.ObjectModel;
-using System.Windows.Media;
 using System.Windows.Data;
 using System.Text.RegularExpressions;
-using System.Windows;
 using CommentViewerCommon;
 
 namespace YouTubeLiveCommentViewer.ViewModel
@@ -152,8 +150,7 @@ namespace YouTubeLiveCommentViewer.ViewModel
                 _siteContext.LoadOptions(siteOptionsPath, _io);
                 _commentProvider = _siteContext.CreateCommentProvider();
                 _commentProvider.Connected += CommentProvider_Connected;
-                _commentProvider.InitialCommentsReceived += CommentProvider_InitialCommentsReceived;
-                _commentProvider.CommentReceived += CommentProvider_CommentReceived;
+                _commentProvider.MessageReceived += CommentProvider_MessageReceived;
                 _commentProvider.MetadataUpdated += CommentProvider_MetadataUpdated;
                 _commentProvider.CanConnectChanged += (s, e) =>
                 {
@@ -371,9 +368,9 @@ namespace YouTubeLiveCommentViewer.ViewModel
             }
         }
         #endregion //LiveTitle
-        
+
         ICommentProvider _commentProvider;
-        IOptions _options;
+        readonly IOptions _options;
         [GalaSoft.MvvmLight.Ioc.PreferredConstructor]
         internal MainViewModel(IYouTubeSiteContext siteContext, IOptions options, IIo io, ILogger logger, IBrowserLoader browserLoader)
             :base(options)
@@ -481,14 +478,6 @@ namespace YouTubeLiveCommentViewer.ViewModel
                 LiveViewers = e.CurrentViewers;
             }
         }
-
-        private void CommentProvider_InitialCommentsReceived(object sender, List<ICommentViewModel> e)
-        {
-            foreach (var comment in e)
-            {
-                AddComment(comment);
-            }
-        }
         private async void PluginManager_PluginAdded(object sender, IPlugin e)
         {
             try
@@ -506,7 +495,48 @@ namespace YouTubeLiveCommentViewer.ViewModel
             }
         }
         public ObservableCollection<PluginMenuItemViewModel> PluginMenuItemCollection { get; } = new ObservableCollection<PluginMenuItemViewModel>();
-        private ObservableCollection<ICommentViewModel> _comments { get; } = new ObservableCollection<ICommentViewModel>();
+        private ObservableCollection<ICommentViewModel> _comments_old { get; } = new ObservableCollection<ICommentViewModel>();
+        private ObservableCollection<IYouTubeLiveCommentViewModel> _comments { get; } = new ObservableCollection<IYouTubeLiveCommentViewModel>();
+        private void CommentProvider_MessageReceived(object sender, IMessageContext e)
+        {
+            var message = e.Message;
+            YouTubeLiveCommentViewModel cvm = null;
+            if(message is IYouTubeLiveComment comment)
+            {
+                cvm = new YouTubeLiveCommentViewModel(comment, e.Metadata, e.Methods);
+            }
+            else if (message is IYouTubeLiveSuperchat superchat)
+            {
+                cvm = new YouTubeLiveCommentViewModel(superchat, e.Metadata, e.Methods);
+            }
+            else if (message is IYouTubeLiveConnected connected)
+            {
+                cvm = new YouTubeLiveCommentViewModel(connected, e.Metadata, e.Methods);
+            }
+            else if (message is IYouTubeLiveDisconnected disconnected)
+            {
+                cvm = new YouTubeLiveCommentViewModel(disconnected, e.Metadata, e.Methods);
+            }
+            if (cvm != null)
+            {
+                if (_isAddingNewCommentTop)
+                {
+                    _comments.Insert(0, cvm);
+                }
+                else
+                {
+                    _comments.Add(cvm);
+                }
+            }
+            try
+            {
+                _pluginManager.SetMessage(message, e.Metadata);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogException(ex);
+            }
+        }
         private void AddComment(ICommentViewModel cvm)
         {
             if (cvm is IInfoCommentViewModel info && info.Type > _options.ShowingInfoLevel)
@@ -515,11 +545,11 @@ namespace YouTubeLiveCommentViewer.ViewModel
             }
             if (_isAddingNewCommentTop)
             {
-                _comments.Insert(0, cvm);
+                _comments_old.Insert(0, cvm);
             }
             else
             {
-                _comments.Add(cvm);
+                _comments_old.Add(cvm);
             }
         }
         private void CommentProvider_CommentReceived(object sender, ICommentViewModel e)
@@ -533,17 +563,17 @@ namespace YouTubeLiveCommentViewer.ViewModel
                 Debug.WriteLine(ex.Message);
                 _logger.LogException(ex);
             }
-            try
-            {
-                if (IsComment(e.MessageType))
-                {
-                    _pluginManager.SetComments(e);
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogException(ex);
-            }
+            //try
+            //{
+            //    if (IsComment(e.MessageType))
+            //    {
+            //        _pluginManager.SetComments(e);
+            //    }
+            //}
+            //catch (Exception ex)
+            //{
+            //    _logger.LogException(ex);
+            //}
         }
         bool IsComment(MessageType type)
         {

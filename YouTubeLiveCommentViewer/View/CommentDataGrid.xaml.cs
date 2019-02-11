@@ -134,6 +134,8 @@ namespace YouTubeLiveCommentViewer
             AutoScrollTest(scrollViewer, a.ExtentHeightChange);
         }
         private bool AutoScroll = true;
+        private bool _isAmode = false;
+        System.Timers.Timer _aModeTimer = new System.Timers.Timer();
         private void AutoScrollTest(ScrollViewer sc, double extentHeightChange)
         {
             // User scroll event : set or unset autoscroll mode
@@ -143,12 +145,27 @@ namespace YouTubeLiveCommentViewer
                 {   // Scroll bar is in bottom
                     // Set autoscroll mode
                     AutoScroll = true;
+                    if (_isAmode)
+                    {
+                        _isAmode = false;
+                        _aModeTimer.Enabled = false;
+                    }
                     Debug.WriteLine("Autoscroll=true");
                 }
                 else
                 {   // Scroll bar isn't in bottom
                     // Unset autoscroll mode
                     AutoScroll = false;
+                    if (!_isAmode)
+                    {
+                        _aModeTimer.Enabled = true;
+                        _isAmode = true;
+                    }
+                    else
+                    {
+                        _aModeTimer.Enabled = false;
+                        //IsAmode = false;
+                    }
                     Debug.WriteLine("Autoscroll=false");
                 }
             }
@@ -159,10 +176,6 @@ namespace YouTubeLiveCommentViewer
                 // Autoscroll
                 sc.ScrollToVerticalOffset(sc.ExtentHeight);
             }
-        }
-        private bool Test(ScrollChangedEventArgs e)
-        {
-            return e.ViewportHeightChange > 0 || e.ExtentHeightChange > 0 || e.ViewportHeightChange < 0 || e.ExtentHeightChange < 0;
         }
     }
     public static class DataGridBehavior

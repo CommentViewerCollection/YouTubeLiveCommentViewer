@@ -1,5 +1,4 @@
-﻿using GalaSoft.MvvmLight.Messaging;
-using SitePlugin;
+﻿using SitePlugin;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,12 +10,12 @@ using System.Windows.Media;
 using YouTubeLiveCommentViewer.ViewModel;
 namespace YouTubeLiveCommentViewer
 {
-    internal class MainViewCloseMessage : MessageBase { }
-    internal class SetAddingCommentDirection : MessageBase
+    internal class MainViewCloseMessage : GalaSoft.MvvmLight.Messaging.MessageBase { }
+    internal class SetAddingCommentDirection : GalaSoft.MvvmLight.Messaging.MessageBase
     {
         public bool IsTop { get; set; }
     }
-    class ShowOptionsViewMessage : MessageBase
+    class ShowOptionsViewMessage : GalaSoft.MvvmLight.Messaging.MessageBase
     {
         public IEnumerable<IOptionsTabPage> Tabs { get; }
         public ShowOptionsViewMessage(IEnumerable<IOptionsTabPage> tabs)
@@ -24,7 +23,7 @@ namespace YouTubeLiveCommentViewer
             Tabs = tabs;
         }
     }
-    class ShowUserViewMessage : MessageBase
+    class ShowUserViewMessage : GalaSoft.MvvmLight.Messaging.MessageBase
     {
         public UserViewModel Uvm { get; }
         public ShowUserViewMessage(UserViewModel uvm)
@@ -32,7 +31,7 @@ namespace YouTubeLiveCommentViewer
             Uvm = uvm;
         }
     }
-    class SetPostCommentPanel : MessageBase
+    class SetPostCommentPanel : GalaSoft.MvvmLight.Messaging.MessageBase
     {
         public UserControl Panel { get; }
         public SetPostCommentPanel(UserControl panel)

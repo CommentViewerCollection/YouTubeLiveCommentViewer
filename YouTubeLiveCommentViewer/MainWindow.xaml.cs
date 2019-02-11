@@ -197,10 +197,6 @@ namespace YouTubeLiveCommentViewer.View
                 sc.ScrollToVerticalOffset(sc.ExtentHeight);
             }
         }
-        private bool Test(ScrollChangedEventArgs e)
-        {
-            return e.ViewportHeightChange > 0 || e.ExtentHeightChange > 0 || e.ViewportHeightChange < 0 || e.ExtentHeightChange < 0;
-        }
     }
     public static class DataGridBehavior
     {

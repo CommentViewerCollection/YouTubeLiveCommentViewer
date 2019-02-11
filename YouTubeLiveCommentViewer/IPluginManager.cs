@@ -8,6 +8,7 @@ namespace YouTubeLiveCommentViewer
         event EventHandler<IPlugin> PluginAdded;
         void LoadPlugins(IPluginHost host);
         void SetComments(ICommentViewModel comments);
+        void SetMessage(IMessage message, IMessageMetadata messageMetadata);
         void OnLoaded();
         void OnClosing();
         void ForeachPlugin(Action<IPlugin> p);
