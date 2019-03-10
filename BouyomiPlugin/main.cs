@@ -78,89 +78,104 @@ namespace BouyomiPlugin
         }
         public void OnCommentReceived(ICommentData data)
         {
-        }
-        public IPluginHost Host { get; set; }
-        public string GetSettingsFilePath()
-        {
-            //ここでRemotingExceptionが発生。終了時の処理だが、既にHostがDisposeされてるのかも。
-            var dir = Host.SettingsDirPath;
-            return System.IO.Path.Combine(dir, $"{Name}.xml");
-        }
-        ConfigView _settingsView;
-        public void ShowSettingView()
-        {
-            if(_settingsView == null)
+            if (!_options.IsEnabled || data.IsNgUser || data.IsFirstComment || (data.Is184&& !_options.Want184Read))
+                return;
+            try
             {
-                _settingsView = new ConfigView
+                //棒読みちゃんが事前に起動されていたらそれを使いたい。
+                //起動していなかったら起動させて、準備ができ次第それ以降のコメントを読んで貰う
+
+                //とりあえず何も確認せずにコメントを送信する。起動していなかったら例外が起きる。
+                if (_options.IsReadHandleName && !string.IsNullOrEmpty(data.Nickname))
                 {
-                    DataContext = new ConfigViewModel(_options)
-                };
+                    var nick = data.Nickname;
+
+                    if (_options.IsAppendNickTitle)
+                        nick += _options.NickTitle;
+                    _bouyomiChanClient.AddTalkTask2(nick);
+                }
+                if (_options.IsReadComment)
+                    _bouyomiChanClient.AddTalkTask2(data.Comment);
             }
-            _settingsView.Topmost = Host.IsTopmost;
-            _settingsView.Left = Host.MainViewLeft;
-            _settingsView.Top = Host.MainViewTop;
-            
-            _settingsView.Show();
-        }
-        public BouyomiPlugin()
-        {
-            _bouyomiChanClient = new FNF.Utility.BouyomiChanClient();
-            _options = new Options();
+            catch (System.Runtime.Remoting.RemotingException)
+            {
+                //多分棒読みちゃんが起動していない。
+                if (_bouyomiChanProcess == null && System.IO.File.Exists(_options.BouyomiChanPath))
+                {
+                    _bouyomiChanProcess = Process.Start(_options.BouyomiChanPath);
+                    _bouyomiChanProcess.EnableRaisingEvents = true;
+                    _bouyomiChanProcess.Exited += (s, e) =>
+                    {
+                        try
+                        {
+                            _bouyomiChanProcess?.Close();//2018/03/25ここで_bouyomiChanProcessがnullになる場合があった
+                        }
+                        catch { }
+                        _bouyomiChanProcess = null;
+                    };
+                }
+                //起動するまでの間にコメントが投稿されたらここに来てしまうが諦める。
+            }
+            catch (Exception)
+            {
+
+            }
         }
         public void OnMessageReceived(IMessage message, IMessageMetadata messageMetadata)
         {
-            if (!_options.IsEnabled || string.IsNullOrEmpty(_options.BouyomiChanPath) || messageMetadata.IsNgUser || messageMetadata.IsInitialComment || (messageMetadata.Is184 && !_options.Want184Read))
+            if (!_options.IsEnabled || messageMetadata.IsNgUser || messageMetadata.IsInitialComment || (messageMetadata.Is184 && !_options.Want184Read))
                 return;
+
+
 
             string name = null;
             string comment = null;
-            if (message is IYouTubeLiveMessage ytMessage)
+            if(message is IYouTubeLiveMessage youTubeLiveMessage)
             {
-                if(ytMessage is IYouTubeLiveConnected connected)
+                switch (youTubeLiveMessage.YouTubeLiveMessageType)
                 {
-                    if (_options.IsYouTubeLiveConnect)
-                    {
-                        name = null;
-                        comment = connected.CommentItems.ToText();
-                    }
-                }
-                if (ytMessage is IYouTubeLiveDisconnected disconnected)
-                {
-                    if (_options.IsYouTubeLiveDisconnect)
-                    {
-                        name = null;
-                        comment = disconnected.CommentItems.ToText();
-                    }
-                }
-                else if (ytMessage is IYouTubeLiveComment ytComment)
-                {
-                    if (_options.IsYouTubeLiveComment)
-                    {
-                        if (_options.IsYouTubeLiveCommentNickname)
+                    case YouTubeLiveMessageType.Connected:
+                        if (_options.IsYouTubeLiveConnect)
                         {
-                            name = ytComment.NameItems.ToText();
+                            name = null;
+                            comment = (youTubeLiveMessage as IYouTubeLiveConnected).CommentItems.ToText();
                         }
-                        if (_options.IsYouTubeLiveCommentStamp)
+                        break;
+                    case YouTubeLiveMessageType.Disconnected:
+                        if (_options.IsYouTubeLiveDisconnect)
                         {
-                            comment = ytComment.CommentItems.ToTextWithImageAlt();
+                            name = null;
+                            comment = (youTubeLiveMessage as IYouTubeLiveDisconnected).CommentItems.ToText();
                         }
-                        else
+                        break;
+                    case YouTubeLiveMessageType.Comment:
+                        if (_options.IsYouTubeLiveComment)
                         {
-                            comment = ytComment.CommentItems.ToText();
+                            if (_options.IsYouTubeLiveCommentNickname)
+                            {
+                                name = (youTubeLiveMessage as IYouTubeLiveComment).NameItems.ToText();
+                            }
+                            if (_options.IsYouTubeLiveCommentStamp)
+                            {
+                                comment = (youTubeLiveMessage as IYouTubeLiveComment).CommentItems.ToTextWithImageAlt();
+                            }
+                            else
+                            {
+                                comment = (youTubeLiveMessage as IYouTubeLiveComment).CommentItems.ToText();
+                            }
                         }
-                    }
-                }
-                else if (ytMessage is IYouTubeLiveSuperchat superchat)
-                {
-                    if (_options.IsYouTubeLiveSuperchat)
-                    {
-                        if (_options.IsYouTubeLiveSuperchatNickname)
+                        break;
+                    case YouTubeLiveMessageType.Superchat:
+                        if (_options.IsYouTubeLiveSuperchat)
                         {
-                            name = superchat.NameItems.ToText();
+                            if (_options.IsYouTubeLiveSuperchatNickname)
+                            {
+                                name = (youTubeLiveMessage as IYouTubeLiveSuperchat).NameItems.ToText();
+                            }
+                            //TODO:superchat中のスタンプも読ませるべきでは？
+                            comment = (youTubeLiveMessage as IYouTubeLiveSuperchat).CommentItems.ToText();
                         }
-                        //TODO:superchat中のスタンプも読ませるべきでは？
-                        comment = superchat.CommentItems.ToText();
-                    }
+                        break;
                 }
             }
 
@@ -205,6 +220,35 @@ namespace BouyomiPlugin
 
             }
         }
+        public IPluginHost Host { get; set; }
+        public string GetSettingsFilePath()
+        {
+            //ここでRemotingExceptionが発生。終了時の処理だが、既にHostがDisposeされてるのかも。
+            var dir = Host.SettingsDirPath;
+            return System.IO.Path.Combine(dir, $"{Name}.xml");
+        }
+        ConfigView _settingsView;
+        public void ShowSettingView()
+        {
+            if(_settingsView == null)
+            {
+                _settingsView = new ConfigView
+                {
+                    DataContext = new ConfigViewModel(_options)
+                };
+            }
+            _settingsView.Topmost = Host.IsTopmost;
+            _settingsView.Left = Host.MainViewLeft;
+            _settingsView.Top = Host.MainViewTop;
+            
+            _settingsView.Show();
+        }
+        public BouyomiPlugin()
+        {
+            _bouyomiChanClient = new FNF.Utility.BouyomiChanClient();
+            _options = new Options();
+        }
+
         #region IDisposable Support
         private bool _disposedValue = false; // To detect redundant calls
 

@@ -10,25 +10,20 @@ using System.Diagnostics;
 using Plugin;
 using System.ComponentModel.Composition;
 using SitePlugin;
+using YouTubeLiveSitePlugin;
 
 namespace CommentViewer.Plugin
 {
     [Export(typeof(IPlugin))]
     public class CommentGeneratorPlugin: IPlugin,IDisposable
     {
-        private Options _options;
-        string _hcgPath = "";
+        protected virtual Options Options { get; set; }
+        //string _hcgPath = "";
         private System.Timers.Timer _writeTimer;
         private System.Timers.Timer _deleteTimer;
         private SynchronizedCollection<Data> _commentCollection = new SynchronizedCollection<Data>();
 
-        private string CommentXmlPath
-        {
-            get
-            {
-                return _hcgPath + "\\comment.xml";
-            }
-        }
+        protected virtual string CommentXmlPath { get; private set; }
         public string Name
         {
             get
@@ -48,7 +43,7 @@ namespace CommentViewer.Plugin
 
         public void OnCommentReceived(ICommentData data)
         {
-            if (!_options.IsEnabled || data.IsNgUser || data.IsFirstComment)
+            if (!Options.IsEnabled || data.IsNgUser || data.IsFirstComment)
                 return;
 
             var a = new Data
@@ -59,9 +54,54 @@ namespace CommentViewer.Plugin
             };
             _commentCollection.Add(a);
         }
-        public void OnLoaded()
+        class CommentData : ICommentData
         {
-            _options = Options.Load(GetSettingsFilePath());
+            public string ThumbnailUrl { get; set; }
+            public int ThumbnailWidth { get; set; }
+            public int ThumbnailHeight { get; set; }
+            public string Id { get; set; }
+            public string UserId { get; set; }
+            public string Nickname { get; set; }
+            public string Comment { get; set; }
+            public bool IsNgUser { get; set; }
+            public bool IsFirstComment { get; set; }
+            public string SiteName { get; set; }
+            public bool Is184 { get; set; }
+        }
+        class Data
+        {
+            public object Comment { get; internal set; }
+            public object SiteName { get; internal set; }
+            public string Nickname { get; internal set; }
+        }
+        public void OnMessageReceived(IMessage message, IMessageMetadata messageMetadata)
+        {
+            if (!(message is IMessageComment comment)) return;
+            if (!Options.IsEnabled || messageMetadata.IsNgUser || messageMetadata.IsInitialComment)
+                return;
+
+            string siteName = "youtubelive";
+
+            string name;
+            if(messageMetadata.User != null && !string.IsNullOrEmpty(messageMetadata.User.Nickname))
+            {
+                name = messageMetadata.User.Nickname;
+            }
+            else
+            {
+                name = comment.NameItems.ToText();
+            }
+            var data = new Data
+            {
+                Comment = comment.CommentItems.ToText(),
+                Nickname = name,
+                 SiteName=siteName,
+            };
+            _commentCollection.Add(data);
+        }
+        public virtual void OnLoaded()
+        {
+            Options = Options.Load(GetSettingsFilePath());
 
             _writeTimer = new System.Timers.Timer
             {
@@ -93,7 +133,7 @@ namespace CommentViewer.Plugin
         }
         private void _deleteTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
-            if (!_options.IsEnabled)
+            if (!Options.IsEnabled)
                 return;
 
             //comment.xmlの要素を定期的に削除する
@@ -124,7 +164,7 @@ namespace CommentViewer.Plugin
             }
         }
 
-        private static string GetHcgPath(string hcgSettingsFilePath)
+        protected virtual string GetHcgPath(string hcgSettingsFilePath)
         {
             string settingXml;
             using (var sr = new StreamReader(hcgSettingsFilePath))
@@ -137,16 +177,28 @@ namespace CommentViewer.Plugin
             return xmlParser.HcgPath;
         }
         private void _writeTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
-        { 
+        {
             //定期的にcomment.xmlに書き込む。
 
-            if (!_options.IsEnabled || _commentCollection.Count == 0)
+            Write();
+        }
+        protected virtual bool IsHcgSettingFileExists()
+        {
+            return File.Exists(Options.HcgSettingFilePath);
+        }
+        /// <summary>
+        /// _commentCollectionの内容をファイルに書き出す
+        /// </summary>
+        public void Write()
+        {
+            if (!Options.IsEnabled || _commentCollection.Count == 0)
                 return;
 
             //TODO:各ファイルが存在しなかった時のエラー表示
-            if (string.IsNullOrEmpty(_hcgPath) && File.Exists(_options.HcgSettingFilePath))
+            if (string.IsNullOrEmpty(CommentXmlPath) && IsHcgSettingFileExists())
             {
-                _hcgPath = GetHcgPath(_options.HcgSettingFilePath);
+                var hcgPath = GetHcgPath(Options.HcgSettingFilePath);
+                CommentXmlPath = hcgPath + "\\comment.xml";
                 //TODO:パスがxmlファイルで無かった場合の対応。ディレクトリの可能性も。
             }
             if (!File.Exists(CommentXmlPath))
@@ -160,7 +212,7 @@ namespace CommentViewer.Plugin
             XElement xml;
             try
             {
-                xml = XElement.Load(CommentXmlPath);                
+                xml = XElement.Load(CommentXmlPath);
             }
             catch (IOException ex)
             {
@@ -181,7 +233,7 @@ namespace CommentViewer.Plugin
                 {
                     var item = new XElement("comment", data.Comment);
                     item.SetAttributeValue("no", "0");
-                    item.SetAttributeValue("time", ToUnixTime(DateTime.Now));
+                    item.SetAttributeValue("time", ToUnixTime(GetCurrentDateTime()));
                     item.SetAttributeValue("owner", 0);
                     item.SetAttributeValue("service", data.SiteName);
                     if (!string.IsNullOrEmpty(data.Nickname))
@@ -189,7 +241,7 @@ namespace CommentViewer.Plugin
                         item.SetAttributeValue("handle", data.Nickname);
                     }
                     xml.Add(item);
-                }                
+                }
             }
             try
             {
@@ -202,6 +254,11 @@ namespace CommentViewer.Plugin
                 Debug.WriteLine(ex.Message);
             }
         }
+        protected virtual DateTime GetCurrentDateTime()
+        {
+            return DateTime.Now;
+        }
+
         public static long ToUnixTime(DateTime dateTime)
         {
             // 時刻をUTCに変換
@@ -215,9 +272,9 @@ namespace CommentViewer.Plugin
             _settingsView?.ForceClose();
             _writeTimer?.Stop();
             _deleteTimer?.Stop();
-            if (_options != null)
+            if (Options != null)
             {
-                Options.Save(_options, GetSettingsFilePath());
+                Options.Save(Options, GetSettingsFilePath());
             }
         }
         SettingsView _settingsView;
@@ -229,7 +286,7 @@ namespace CommentViewer.Plugin
             {
                 _settingsView = new SettingsView
                 {
-                    DataContext = new ConfigViewModel(_options)
+                    DataContext = new ConfigViewModel(Options)
                 };
             }
             _settingsView.Topmost = Host.IsTopmost;
@@ -259,44 +316,6 @@ namespace CommentViewer.Plugin
             {
                 _settingsView.Topmost = isTopmost;
             }
-        }
-
-        public void OnMessageReceived(IMessage message, IMessageMetadata messageMetadata)
-        {
-            if (!(message is IMessageComment comment)) return;
-            if (!_options.IsEnabled || messageMetadata.IsNgUser || messageMetadata.IsFirstComment)
-                return;
-
-            var data = new Data
-            {
-                Comment = comment.CommentItems.ToText(),
-                Nickname = comment.NameItems.ToText(),
-            };
-            _commentCollection.Add(data);
-        }
-    }
-    class Data
-    {
-        public object Comment { get; internal set; }
-        public object SiteName { get; internal set; } = "youtubelive";
-        public string Nickname { get; internal set; }
-    }
-    static class MessageItemsExtensions
-    {
-        public static string ToText(this IEnumerable<IMessagePart> parts)
-        {
-            string s = "";
-            if (parts != null)
-            {
-                foreach (var part in parts)
-                {
-                    if (part is IMessageText text)
-                    {
-                        s += text;
-                    }
-                }
-            }
-            return s;
         }
     }
 }

@@ -53,6 +53,7 @@
     <Compile Include="ConfigViewModel.cs" />
     <Compile Include="DynamicXmlParser.cs" />
     <Compile Include="main.cs" />
+    <Compile Include="MessageItemsExtensions.cs" />
     <Compile Include="Options.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SettingsView.xaml.cs">
@@ -71,13 +72,17 @@
       <Name>Plugin</Name>
     </ProjectReference>
     <ProjectReference Include="..\ISitePlugin\SitePlugin.csproj">
-      <Project>{C13BFDF0-3B93-475F-900E-E7BAD97ACE3D}</Project>
+      <Project>{c13bfdf0-3b93-475f-900e-e7bad97ace3d}</Project>
       <Name>SitePlugin</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\YouTubeLiveIF\YouTubeLiveIF.csproj">
+      <Project>{83974e62-4d55-4e67-8f88-bbff2222e5a1}</Project>
+      <Name>YouTubeLiveIF</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="MvvmLightLibs">
-      <Version>5.4.1</Version>
+      <Version>5.4.1.1</Version>
     </PackageReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

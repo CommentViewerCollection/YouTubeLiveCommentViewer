@@ -126,13 +126,13 @@ namespace BouyomiPlugin
         }
         public ConfigViewModel()
         {
-            if (IsInDesignMode)
-            {
+            //if (IsInDesignMode)
+            //{
 
-            }else
-            {
-                throw new NotSupportedException();
-            }
+            //}else
+            //{
+            //    throw new NotSupportedException();
+            //}
         }
         [GalaSoft.MvvmLight.Ioc.PreferredConstructor]
         public ConfigViewModel(Options options)
