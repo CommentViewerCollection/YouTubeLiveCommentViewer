@@ -204,7 +204,7 @@ namespace YouTubeLiveSitePlugin.Test2
                 TotalViewers = "",
             });
             string vid = null;
-            var retryCount = 0;
+            var retryCount = -1;
             bool isInputStoringNeeded = false;
             var resolver = new VidResolver();
             try
@@ -264,6 +264,12 @@ namespace YouTubeLiveSitePlugin.Test2
 
             _cc = CreateCookieContainer(browserProfile);
 reload:
+            if(retryCount > 5)
+            {
+                AfterConnect();
+                return;
+            }
+            retryCount++;
 
             string liveChatHtml = null;
 
@@ -273,23 +279,23 @@ reload:
                 var liveChatUrl = $"https://www.youtube.com/live_chat?v={vid}&is_popout=1";
                 liveChatHtml = await _server.GetAsync(liveChatUrl, _cc);
             }
-            catch(WebException ex) when(ex.Status == WebExceptionStatus.ProtocolError)
+            catch(HttpException ex)
             {
-                if(ex.Response is HttpWebResponse http)
+                var statuscode = ex.StatusCode;
+                switch (statuscode)
                 {
-                    switch (http.StatusCode)
-                    {
-                        case HttpStatusCode.BadRequest:
-                            SendInfo("入力されたURLは存在しない可能性があります", InfoType.Error);
-                            break;
-                        case HttpStatusCode.InternalServerError:
-                            SendInfo("サーバでエラーが発生しました", InfoType.Error);
-                            break;
-                        case HttpStatusCode.ServiceUnavailable:
-                            SendInfo("サーバが落ちています", InfoType.Error);
-                            break;
-                    }
-                    //http.StatusCode
+                    case 400://BadRequest
+                        SendInfo("入力されたURLは存在しない可能性があります", InfoType.Error);
+                        break;
+                    case 500:
+                        SendInfo("サーバでエラーが発生しました", InfoType.Error);
+                        break;
+                    case 503:
+                        SendInfo("サーバが落ちています", InfoType.Error);
+                        break;
+                    default:
+                        SendInfo($"{ex.Message}", InfoType.Error);
+                        break;
                 }
                 AfterConnect();
                 return;
@@ -297,18 +303,19 @@ reload:
             catch(Exception ex)
             {
                 _logger.LogException(ex);
+                SendInfo("未知のエラーが発生しました", InfoType.Error);
+                AfterConnect();
+                return;
             }
             if (string.IsNullOrEmpty(liveChatHtml))
             {
                 await Task.Delay(3000);
                 goto reload;
             }
+
+            //ytInitialDataを取得して、そこからcontinuationと直近の過去コメントを取得する
             try
             {
-
-
-                var tasks = new List<Task>();
-
                 string ytInitialData = null;
                 try
                 {
@@ -335,7 +342,7 @@ reload:
                     //放送終了
                     return;
                 }
-                catch(ParseException ex)
+                catch (ParseException ex)
                 {
                     _logger.LogException(ex, "", $"input={input}");
                     return;
@@ -347,140 +354,205 @@ reload:
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogException(ex,"未知の例外", $"ytInitialData={ytInitialData},input={input}");
+                    _logger.LogException(ex, "未知の例外", $"ytInitialData={ytInitialData},input={input}");
                     SendInfo("ytInitialDataの解析に失敗しました", InfoType.Error);
                     return;
                 }
                 Connected?.Invoke(this, new ConnectedEventArgs { IsInputStoringNeeded = isInputStoringNeeded });
-                foreach(var data in initialCommentData)
+
+                //直近の過去コメントを送る。ただし、再接続の場合は不要。
+                if (retryCount == 0)
                 {
-                    if (_receivedCommentIds.Contains(data.Id))
+                    foreach (var data in initialCommentData)
                     {
-                        continue;
+                        if (_receivedCommentIds.Contains(data.Id))
+                        {
+                            continue;
+                        }
+                        else
+                        {
+                            _receivedCommentIds.Add(data.Id);
+                        }
+                        var messageContext = CreateMessageContext(data, true);
+                        MessageReceived?.Invoke(this, messageContext);
                     }
-                    else
-                    {
-                        _receivedCommentIds.Add(data.Id);
-                    }
-                    var messageContext = CreateMessageContext(data, true);
-                    MessageReceived?.Invoke(this, messageContext);
                 }
 
                 //コメント投稿に必要なものの準備
-                var liveChatContext = Tools.GetLiveChatContext(liveChatHtml);
-                IsLoggedIn = liveChatContext.IsLoggedIn;
-                if(Tools.TryExtractSendButtonServiceEndpoint(ytInitialData, out string serviceEndPoint))
-                {
-                    try
-                    {
-                        var json = DynamicJson.Parse(serviceEndPoint);
-                        PostCommentContext = new PostCommentContext
-                        {
-                            ClientIdPrefix = json.sendLiveChatMessageEndpoint.clientIdPrefix,
-                            SessionToken = liveChatContext.XsrfToken,
-                            Sej = serviceEndPoint,
-                        };
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogException(ex, "", $"serviceEndPoint={serviceEndPoint}");
-                    }
-                }
+                PrepareForPostingComments(liveChatHtml, ytInitialData);
 
-                Task chatTask = null;
-                Task metaTask = null;
-                Task activeCounterTask = null;
+                var tasks = new List<Task>();
 
-                if (_options.IsActiveCountEnabled)
+                var activeCounterTask = CreateActiveCounterTask();
+                if (activeCounterTask != null)
                 {
-                    activeCounterTask = _activeCounter.Start();
                     tasks.Add(activeCounterTask);
                 }
-                _chatProvider = new ChatProvider(_server, _logger);
-                _chatProvider.ActionsReceived += ChatProvider_ActionsReceived;
-                _chatProvider.InfoReceived += ChatProvider_InfoReceived;
-                chatTask = _chatProvider.ReceiveAsync(vid, initialContinuation, _cc);
+
+                var chatTask = CreateChatProviderReceivingTask(vid, initialContinuation);
                 tasks.Add(chatTask);
 
-                string ytCfg = null;
-                try
+                var metaTask = CreateMetadataReceivingTask(browserProfile, vid, liveChatHtml);
+                if (metaTask != null)
                 {
-                    ytCfg = Tools.ExtractYtcfg(liveChatHtml);
-                }
-                catch (ParseException ex)
-                {
-                    _logger.LogException(ex, "live_chatからのytcfgの抜き出しに失敗", liveChatHtml);
-                }
-                if (!string.IsNullOrEmpty(ytCfg))
-                {
-                    //"service_ajax?name=updatedMetadataEndpoint"はIEには対応していないらしく、400が返って来てしまう。
-                    //そこで、IEの場合のみ旧版の"youtubei"を使うようにした。
-                    if (browserProfile.Type == BrowserType.IE)
-                    {
-                        _metaProvider = new MetaDataYoutubeiProvider(_server, _logger);
-                    }
-                    else
-                    {
-                        _metaProvider = new MetadataProvider(_server, _logger);
-                    }
-                    _metaProvider.MetadataReceived += MetaProvider_MetadataReceived;
-                    //_metaProvider.Noticed += _metaProvider_Noticed;
-                    _metaProvider.InfoReceived += MetaProvider_MetadataReceived;
-                    metaTask = _metaProvider.ReceiveAsync(ytCfg: ytCfg, vid: vid, cc: _cc);
                     tasks.Add(metaTask);
                 }
-                var t = await Task.WhenAny(tasks);
-                if(t == metaTask)
+
+                while (tasks.Count > 0)
                 {
-                    try
+                    var t = await Task.WhenAny(tasks);
+                    if (t == metaTask)
                     {
-                        await metaTask;
+                        try
+                        {
+                            await metaTask;
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.LogException(ex, "metaTaskが終了した原因");
+                        }
+                        //metaTask内でParseExceptionもしくはDisconnect()
+                        //metaTaskは終わっても良い。
+                        tasks.Remove(metaTask);
                     }
-                    catch (Exception ex)
+                    else if (t == activeCounterTask)
                     {
-                        _logger.LogException(ex, "metaTaskが終了した原因");
+                        try
+                        {
+                            await activeCounterTask;
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.LogException(ex, "activeCounterTaskが終了した原因");
+                        }
+                        tasks.Remove(activeCounterTask);
                     }
-                    //metaTask内でParseExceptionもしくはDisconnect()
-                    //metaTaskは終わっても良い。
-                    await chatTask;
+                    else //chatTask
+                    {
+                        tasks.Remove(chatTask);
+                        try
+                        {
+                            await chatTask;
+                        }
+                        catch (ReloadException)
+                        {
+                            goto reload;
+                        }
+                        catch (ChatUnavailableException)
+                        {
+                            SendInfo("放送が終了しているかチャットが無効な放送です", InfoType.Error);
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.LogException(ex);
+                        }
+
+                        //chatTaskが終わったらmetaTaskも終了させる
+                        _metaProvider.Disconnect();
+                        try
+                        {
+                            await metaTask;
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.LogException(ex, "metaTaskが終了した原因");
+                        }
+                        tasks.Remove(metaTask);
+
+                        _activeCounter?.Stop();
+                        try
+                        {
+                            await activeCounterTask;
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.LogException(ex, "activeCounterTaskが終了した原因");
+                        }
+                        tasks.Remove(activeCounterTask);
+                    }
                 }
-                else if(t == activeCounterTask)
-                {
-                    try
-                    {
-                        await activeCounterTask;
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogException(ex, "activeCounterTaskが終了した原因");
-                    }
-                }
-                else
-                {
-                    //chatTaskが終わったらmetaTaskも終了させる
-                    _metaProvider.Disconnect();
-                    _activeCounter?.Stop();
-                    await metaTask;
-                }
-            }
-            catch (ReloadException)
-            {
-                retryCount++;
-                goto reload;
-            }
-            catch(ChatUnavailableException)
-            {
-                SendInfo("放送が終了しているかチャットが無効な放送です", InfoType.Error);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogException(ex);
             }
             finally
             {
                 AfterConnect();
             }
         }
+
+        private void PrepareForPostingComments(string liveChatHtml, string ytInitialData)
+        {
+            var liveChatContext = Tools.GetLiveChatContext(liveChatHtml);
+            IsLoggedIn = liveChatContext.IsLoggedIn;
+            if (Tools.TryExtractSendButtonServiceEndpoint(ytInitialData, out string serviceEndPoint))
+            {
+                try
+                {
+                    var json = DynamicJson.Parse(serviceEndPoint);
+                    PostCommentContext = new PostCommentContext
+                    {
+                        ClientIdPrefix = json.sendLiveChatMessageEndpoint.clientIdPrefix,
+                        SessionToken = liveChatContext.XsrfToken,
+                        Sej = serviceEndPoint,
+                    };
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogException(ex, "", $"serviceEndPoint={serviceEndPoint}");
+                }
+            }
+        }
+
+        private Task CreateActiveCounterTask()
+        {
+            Task activeCounterTask = null;
+            if (_options.IsActiveCountEnabled)
+            {
+                activeCounterTask = _activeCounter.Start();
+            }
+            return activeCounterTask;
+        }
+
+        private Task CreateChatProviderReceivingTask(string vid, IContinuation initialContinuation)
+        {
+            _chatProvider = new ChatProvider(_server, _logger);
+            _chatProvider.ActionsReceived += ChatProvider_ActionsReceived;
+            _chatProvider.InfoReceived += ChatProvider_InfoReceived;
+            var chatTask = _chatProvider.ReceiveAsync(vid, initialContinuation, _cc);
+            return chatTask;
+        }
+
+        private Task CreateMetadataReceivingTask(IBrowserProfile browserProfile, string vid, string liveChatHtml)
+        {
+            Task metaTask = null;
+            string ytCfg = null;
+            try
+            {
+                ytCfg = Tools.ExtractYtcfg(liveChatHtml);
+            }
+            catch (ParseException ex)
+            {
+                _logger.LogException(ex, "live_chatからのytcfgの抜き出しに失敗", liveChatHtml);
+            }
+            if (!string.IsNullOrEmpty(ytCfg))
+            {
+                //"service_ajax?name=updatedMetadataEndpoint"はIEには対応していないらしく、400が返って来てしまう。
+                //そこで、IEの場合のみ旧版の"youtubei"を使うようにした。
+                if (browserProfile.Type == BrowserType.IE)
+                {
+                    _metaProvider = new MetaDataYoutubeiProvider(_server, _logger);
+                }
+                else
+                {
+                    _metaProvider = new MetadataProvider(_server, _logger);
+                }
+                _metaProvider.MetadataReceived += MetaProvider_MetadataReceived;
+                //_metaProvider.Noticed += _metaProvider_Noticed;
+                _metaProvider.InfoReceived += MetaProvider_MetadataReceived;
+                metaTask = _metaProvider.ReceiveAsync(ytCfg: ytCfg, vid: vid, cc: _cc);
+            }
+
+            return metaTask;
+        }
+
         /// <summary>
         /// 文字列から@ニックネームを抽出する
         /// 文字列中に@が複数ある場合は一番最後のものを採用する
@@ -630,6 +702,12 @@ reload:
                 {
                     _logger.LogException(ex);
                     SendInfo(ex.Message, InfoType.Error);
+                }
+                catch(HttpException ex)
+                {
+                    //{\"errors\":[\"検証中にエラーが発生しました。\"]} statuscodeは分からないけど200以外
+                    _logger.LogException(ex, "", $"text={text},statuscode={ex.StatusCode}");
+                    SendInfo("コメント投稿時にエラーが発生", InfoType.Error);
                 }
                 catch (Exception ex)
                 {

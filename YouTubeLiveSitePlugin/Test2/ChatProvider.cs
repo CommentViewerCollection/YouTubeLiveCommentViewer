@@ -82,7 +82,7 @@ namespace YouTubeLiveSitePlugin.Test2
                     {
                         //回復の見込みが無いと判断
                         _logger.LogException(ex, "", $"vid={vid},url={getLiveChatUrl},getLiveChatJson={getLiveChatJson}");
-                        break;
+                        throw new ReloadException();
                     }
                     else
                     {
