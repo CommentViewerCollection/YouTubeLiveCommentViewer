@@ -55,6 +55,8 @@ namespace YouTubeLiveCommentViewer
         double PostTimeWidth { get; set; }
         bool IsShowPostTime { get; set; }
 
+        bool IsShowViewCount { get; set; }
+
         InfoType ShowingInfoLevel { get; set; }
         /// <summary>
         /// 起動時にリストアする前回の入力値

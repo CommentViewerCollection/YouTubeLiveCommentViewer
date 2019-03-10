@@ -101,6 +101,11 @@ namespace YouTubeLiveCommentViewer.ViewModel
                 //TODO:
             }
         }
+        public bool IsShowViewCount
+        {
+            get { return _options.IsShowViewCount; }
+            set { _options.IsShowViewCount = value; }
+        }
         string Name
         {
             get
@@ -414,6 +419,9 @@ namespace YouTubeLiveCommentViewer.ViewModel
                         break;
                     case nameof(options.IsShowPostTime):
                         RaisePropertyChanged(nameof(IsShowPostTime));
+                        break;
+                    case nameof(options.IsShowViewCount):
+                        RaisePropertyChanged(nameof(IsShowViewCount));
                         break;
                 }
             };
