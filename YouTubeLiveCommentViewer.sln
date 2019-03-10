@@ -9,29 +9,29 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YouTubeLiveCommentViewer", 
 		{13A909DD-3791-4539-9C04-F72D9E755DCF} = {13A909DD-3791-4539-9C04-F72D9E755DCF}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BrowserCookieImplementations", "BrowserCookieImplementations\BrowserCookieImplementations\BrowserCookieImplementations.csproj", "{DFE01D83-BDBF-4B5C-95D5-9F1034597EDE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BouyomiPlugin", "BouyomiPlugin\BouyomiPlugin.csproj", "{13A909DD-3791-4539-9C04-F72D9E755DCF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BrowserCookieInterfaces", "BrowserCookieInterfaces\BrowserCookieInterfaces\BrowserCookieInterfaces.csproj", "{CDBBBF25-AD0C-4EAF-B673-EB0BB198585A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BrowserCookieImplementations", "BrowserCookieImplementations\BrowserCookieImplementations.csproj", "{DFE01D83-BDBF-4B5C-95D5-9F1034597EDE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common", "Common\Common\Common.csproj", "{66D18DE1-4D66-41A5-B0E2-47DF9975495A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BrowserCookieInterfaces", "BrowserCookieInterfaces\BrowserCookieInterfaces.csproj", "{CDBBBF25-AD0C-4EAF-B673-EB0BB198585A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Plugin", "IPlugin\IPlugin\Plugin.csproj", "{735CFEEE-5B77-4D36-977B-4CD94A6F3CDB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommentGeneratorPlugin", "CommentGeneratorPlugin\CommentGeneratorPlugin.csproj", "{88B68D39-41A4-4C10-B942-0F3BE976D7A3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SitePlugin", "ISitePlugin\ISitePlugin\SitePlugin.csproj", "{C13BFDF0-3B93-475F-900E-E7BAD97ACE3D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommentViewerCommon", "CommentViewerCommon\CommentViewerCommon.csproj", "{18A7A590-4C58-4755-A24C-6EDA52E0C3EB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YouTubeLiveSitePlugin", "YouTubeLiveSitePlugin\YouTubeLiveSitePlugin\YouTubeLiveSitePlugin.csproj", "{D3FD476C-9801-4861-8FA1-C3D57FF30C83}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common", "Common\Common.csproj", "{66D18DE1-4D66-41A5-B0E2-47DF9975495A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommentGeneratorPlugin", "CommentGeneratorPlugin\CommentGeneratorPlugin\CommentGeneratorPlugin.csproj", "{88B68D39-41A4-4C10-B942-0F3BE976D7A3}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Plugin", "IPlugin\Plugin.csproj", "{735CFEEE-5B77-4D36-977B-4CD94A6F3CDB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YouTubeLiveSitePluginTests", "YouTubeLiveSitePlugin\YouTubeLiveSitePluginTests\YouTubeLiveSitePluginTests.csproj", "{A39D3546-FB5F-41FC-AAE0-2AC1B5C61ECF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SitePlugin", "ISitePlugin\SitePlugin.csproj", "{C13BFDF0-3B93-475F-900E-E7BAD97ACE3D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommentViewerCommon", "CommentViewerCommon\CommentViewerCommon\CommentViewerCommon.csproj", "{18A7A590-4C58-4755-A24C-6EDA52E0C3EB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SitePluginCommon", "SitePluginCommon\SitePluginCommon.csproj", "{AAF4779F-F8BF-4794-A6E8-4ED88A8B6B68}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SitePluginCommon", "SitePluginCommon\SitePluginCommon\SitePluginCommon.csproj", "{AAF4779F-F8BF-4794-A6E8-4ED88A8B6B68}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YouTubeLiveIF", "YouTubeLiveIF\YouTubeLiveIF.csproj", "{83974E62-4D55-4E67-8F88-BBFF2222E5A1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YouTubeLiveIF", "YouTubeLiveIF\YouTubeLiveIF\YouTubeLiveIF.csproj", "{83974E62-4D55-4E67-8F88-BBFF2222E5A1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YouTubeLiveSitePlugin", "YouTubeLiveSitePlugin\YouTubeLiveSitePlugin.csproj", "{D3FD476C-9801-4861-8FA1-C3D57FF30C83}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BouyomiPlugin", "BouyomiPlugin_YouTubeLive\BouyomiPlugin\BouyomiPlugin.csproj", "{13A909DD-3791-4539-9C04-F72D9E755DCF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YouTubeLiveSitePluginTests", "YouTubeLiveSitePluginTests\YouTubeLiveSitePluginTests.csproj", "{A39D3546-FB5F-41FC-AAE0-2AC1B5C61ECF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -43,6 +43,10 @@ Global
 		{EBA3CB8F-6609-48EC-B98B-7B116FC926A3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EBA3CB8F-6609-48EC-B98B-7B116FC926A3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EBA3CB8F-6609-48EC-B98B-7B116FC926A3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{13A909DD-3791-4539-9C04-F72D9E755DCF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{13A909DD-3791-4539-9C04-F72D9E755DCF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{13A909DD-3791-4539-9C04-F72D9E755DCF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{13A909DD-3791-4539-9C04-F72D9E755DCF}.Release|Any CPU.Build.0 = Release|Any CPU
 		{DFE01D83-BDBF-4B5C-95D5-9F1034597EDE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{DFE01D83-BDBF-4B5C-95D5-9F1034597EDE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DFE01D83-BDBF-4B5C-95D5-9F1034597EDE}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -51,6 +55,14 @@ Global
 		{CDBBBF25-AD0C-4EAF-B673-EB0BB198585A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CDBBBF25-AD0C-4EAF-B673-EB0BB198585A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CDBBBF25-AD0C-4EAF-B673-EB0BB198585A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{88B68D39-41A4-4C10-B942-0F3BE976D7A3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{88B68D39-41A4-4C10-B942-0F3BE976D7A3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{88B68D39-41A4-4C10-B942-0F3BE976D7A3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{88B68D39-41A4-4C10-B942-0F3BE976D7A3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{18A7A590-4C58-4755-A24C-6EDA52E0C3EB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{18A7A590-4C58-4755-A24C-6EDA52E0C3EB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{18A7A590-4C58-4755-A24C-6EDA52E0C3EB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{18A7A590-4C58-4755-A24C-6EDA52E0C3EB}.Release|Any CPU.Build.0 = Release|Any CPU
 		{66D18DE1-4D66-41A5-B0E2-47DF9975495A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{66D18DE1-4D66-41A5-B0E2-47DF9975495A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{66D18DE1-4D66-41A5-B0E2-47DF9975495A}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -63,22 +75,6 @@ Global
 		{C13BFDF0-3B93-475F-900E-E7BAD97ACE3D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C13BFDF0-3B93-475F-900E-E7BAD97ACE3D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C13BFDF0-3B93-475F-900E-E7BAD97ACE3D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{D3FD476C-9801-4861-8FA1-C3D57FF30C83}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D3FD476C-9801-4861-8FA1-C3D57FF30C83}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D3FD476C-9801-4861-8FA1-C3D57FF30C83}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D3FD476C-9801-4861-8FA1-C3D57FF30C83}.Release|Any CPU.Build.0 = Release|Any CPU
-		{88B68D39-41A4-4C10-B942-0F3BE976D7A3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{88B68D39-41A4-4C10-B942-0F3BE976D7A3}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{88B68D39-41A4-4C10-B942-0F3BE976D7A3}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{88B68D39-41A4-4C10-B942-0F3BE976D7A3}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A39D3546-FB5F-41FC-AAE0-2AC1B5C61ECF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A39D3546-FB5F-41FC-AAE0-2AC1B5C61ECF}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A39D3546-FB5F-41FC-AAE0-2AC1B5C61ECF}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A39D3546-FB5F-41FC-AAE0-2AC1B5C61ECF}.Release|Any CPU.Build.0 = Release|Any CPU
-		{18A7A590-4C58-4755-A24C-6EDA52E0C3EB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{18A7A590-4C58-4755-A24C-6EDA52E0C3EB}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{18A7A590-4C58-4755-A24C-6EDA52E0C3EB}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{18A7A590-4C58-4755-A24C-6EDA52E0C3EB}.Release|Any CPU.Build.0 = Release|Any CPU
 		{AAF4779F-F8BF-4794-A6E8-4ED88A8B6B68}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{AAF4779F-F8BF-4794-A6E8-4ED88A8B6B68}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AAF4779F-F8BF-4794-A6E8-4ED88A8B6B68}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -87,10 +83,14 @@ Global
 		{83974E62-4D55-4E67-8F88-BBFF2222E5A1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{83974E62-4D55-4E67-8F88-BBFF2222E5A1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{83974E62-4D55-4E67-8F88-BBFF2222E5A1}.Release|Any CPU.Build.0 = Release|Any CPU
-		{13A909DD-3791-4539-9C04-F72D9E755DCF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{13A909DD-3791-4539-9C04-F72D9E755DCF}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{13A909DD-3791-4539-9C04-F72D9E755DCF}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{13A909DD-3791-4539-9C04-F72D9E755DCF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D3FD476C-9801-4861-8FA1-C3D57FF30C83}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D3FD476C-9801-4861-8FA1-C3D57FF30C83}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D3FD476C-9801-4861-8FA1-C3D57FF30C83}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D3FD476C-9801-4861-8FA1-C3D57FF30C83}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A39D3546-FB5F-41FC-AAE0-2AC1B5C61ECF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A39D3546-FB5F-41FC-AAE0-2AC1B5C61ECF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A39D3546-FB5F-41FC-AAE0-2AC1B5C61ECF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A39D3546-FB5F-41FC-AAE0-2AC1B5C61ECF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
