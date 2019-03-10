@@ -71,6 +71,7 @@ namespace YouTubeLiveCommentViewer
         public bool IsActiveCountEnabled { get => GetValue(); set => SetValue(value); }
         public int ActiveCountIntervalSec { get => GetValue(); set => SetValue(value); }
         public int ActiveMeasureSpanMin { get => GetValue(); set => SetValue(value); }
+        public bool IsShowViewCount { get => GetValue(); set => SetValue(value); }
         protected override void Init()
         {
             Dict.Add(nameof(FontFamily), new Item { DefaultValue = new FontFamily("メイリオ, Meiryo"), Predicate = f => true, Serializer = f => FontFamilyToString(f), Deserializer = s => FontFamilyFromString(s) });
@@ -142,6 +143,8 @@ namespace YouTubeLiveCommentViewer
             Dict.Add(nameof(IsActiveCountEnabled), new Item { DefaultValue = true, Predicate = b => true, Serializer = b => b.ToString(), Deserializer = s => bool.Parse(s) });
             Dict.Add(nameof(ActiveCountIntervalSec), new Item { DefaultValue = 1, Predicate = n => n > 0, Serializer = n => n.ToString(), Deserializer = s => int.Parse(s) });
             Dict.Add(nameof(ActiveMeasureSpanMin), new Item { DefaultValue = 10, Predicate = n => n > 0, Serializer = n => n.ToString(), Deserializer = s => int.Parse(s) });
+
+            Dict.Add(nameof(IsShowViewCount), new Item { DefaultValue = true, Predicate = b => true, Serializer = b => b.ToString(), Deserializer = s => bool.Parse(s) });
 
             //以下使わないけど、IOptionsに要求される
             //Dict.Add(nameof(ConnectionNameWidth), new Item { DefaultValue = 100, Predicate = n => n > 0, Serializer = n => n.ToString(), Deserializer = s => double.Parse(s) });

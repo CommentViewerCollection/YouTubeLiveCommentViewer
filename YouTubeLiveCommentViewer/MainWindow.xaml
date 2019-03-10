@@ -45,6 +45,7 @@
             </MenuItem>
             <MenuItem Header="表示">
                 <MenuItem Header="放送情報" IsChecked="{Binding IsShowLiveInfo}" IsCheckable="True" />
+                <MenuItem Header="同時視聴数" IsChecked="{Binding IsShowViewCount}" IsCheckable="True" />
             </MenuItem>
             <MenuItem Header="設定">
                 <MenuItem Header="常に一番手前に表示" IsChecked="{Binding Topmost}" IsCheckable="True" />
@@ -100,8 +101,8 @@
 
             </Grid>
             <Grid Grid.Row="1">
-                <Label x:Name="label" Content="同時視聴数" HorizontalAlignment="Left" Padding="0" Margin="10,28,0,0" VerticalAlignment="Top"/>
-                <TextBlock Text="{Binding LiveViewers}" FontSize="14" Padding="0" Margin="80,28,307,0" />
+                <Label x:Name="label" Content="同時視聴数" HorizontalAlignment="Left" Padding="0" Margin="10,28,0,0" VerticalAlignment="Top" Visibility="{Binding IsShowViewCount, Converter={StaticResource booleanToVisibilityConverter}}" />
+                <TextBlock Text="{Binding LiveViewers}" FontSize="14" Padding="0" Margin="80,28,307,0" Visibility="{Binding IsShowViewCount, Converter={StaticResource booleanToVisibilityConverter}}" />
                 <!--<Label x:Name="label1" Content="累積視聴数" Padding="0" Margin="151,31,257,-4"/>
                 <TextBlock Margin="225,31,178,-3" Padding="0" Text="{Binding Viewers}" />-->
                 <TextBlock x:Name="textBlock" HorizontalAlignment="Left" Margin="11,6,0,0" TextWrapping="NoWrap" Text="{Binding LiveTitle}" FontSize="18" FontWeight="Bold" VerticalAlignment="Top"/>
