@@ -101,26 +101,6 @@
       <Project>{83974e62-4d55-4e67-8f88-bbff2222e5a1}</Project>
       <Name>YouTubeLiveIF</Name>
     </ProjectReference>
-    <ProjectReference Include="K:\programming\workspace\YouTubeLiveCommentViewer\\BrowserCookieInterfaces\BrowserCookieInterfaces\BrowserCookieInterfaces.csproj">
-      <Project>{cdbbbf25-ad0c-4eaf-b673-eb0bb198585a}</Project>
-      <Name>BrowserCookieInterfaces</Name>
-    </ProjectReference>
-    <ProjectReference Include="K:\programming\workspace\YouTubeLiveCommentViewer\\YouTubeLiveIF\YouTubeLiveIF\YouTubeLiveIF.csproj">
-      <Project>{83974e62-4d55-4e67-8f88-bbff2222e5a1}</Project>
-      <Name>YouTubeLiveIF</Name>
-    </ProjectReference>
-    <ProjectReference Include="K:\programming\workspace\YouTubeLiveCommentViewer\\Common\Common\Common.csproj">
-      <Project>{66D18DE1-4D66-41A5-B0E2-47DF9975495A}</Project>
-      <Name>Common</Name>
-    </ProjectReference>
-    <ProjectReference Include="K:\programming\workspace\YouTubeLiveCommentViewer\\ISitePlugin\ISitePlugin\SitePlugin.csproj">
-      <Project>{c13bfdf0-3b93-475f-900e-e7bad97ace3d}</Project>
-      <Name>SitePlugin</Name>
-    </ProjectReference>
-    <ProjectReference Include="K:\programming\workspace\YouTubeLiveCommentViewer\\SitePluginCommon\SitePluginCommon\SitePluginCommon.csproj">
-      <Project>{aaf4779f-f8bf-4794-a6e8-4ed88a8b6b68}</Project>
-      <Name>SitePluginCommon</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Extended.Wpf.Toolkit">

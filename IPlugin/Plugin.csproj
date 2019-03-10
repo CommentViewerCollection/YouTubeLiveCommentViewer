@@ -50,10 +50,6 @@
       <Project>{c13bfdf0-3b93-475f-900e-e7bad97ace3d}</Project>
       <Name>SitePlugin</Name>
     </ProjectReference>
-    <ProjectReference Include="K:\programming\workspace\YouTubeLiveCommentViewer\\ISitePlugin\ISitePlugin\SitePlugin.csproj">
-      <Project>{c13bfdf0-3b93-475f-900e-e7bad97ace3d}</Project>
-      <Name>SitePlugin</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

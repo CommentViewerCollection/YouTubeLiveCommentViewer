@@ -142,26 +142,6 @@
       <Project>{c13bfdf0-3b93-475f-900e-e7bad97ace3d}</Project>
       <Name>SitePlugin</Name>
     </ProjectReference>
-    <ProjectReference Include="K:\programming\workspace\YouTubeLiveCommentViewer\\BrowserCookieInterfaces\BrowserCookieInterfaces\BrowserCookieInterfaces.csproj">
-      <Project>{cdbbbf25-ad0c-4eaf-b673-eb0bb198585a}</Project>
-      <Name>BrowserCookieInterfaces</Name>
-    </ProjectReference>
-    <ProjectReference Include="K:\programming\workspace\YouTubeLiveCommentViewer\\BrowserCookieImplementations\BrowserCookieImplementations\BrowserCookieImplementations.csproj">
-      <Project>{dfe01d83-bdbf-4b5c-95d5-9f1034597ede}</Project>
-      <Name>BrowserCookieImplementations</Name>
-    </ProjectReference>
-    <ProjectReference Include="$(SolutionDir)\BrowserCookieInterfaces\BrowserCookieInterfaces\BrowserCookieInterfaces.csproj">
-      <Project>{cdbbbf25-ad0c-4eaf-b673-eb0bb198585a}</Project>
-      <Name>BrowserCookieInterfaces</Name>
-    </ProjectReference>
-    <ProjectReference Include="K:\programming\workspace\YouTubeLiveCommentViewer\\IPlugin\IPlugin\Plugin.csproj">
-      <Project>{735cfeee-5b77-4d36-977b-4cd94a6f3cdb}</Project>
-      <Name>Plugin</Name>
-    </ProjectReference>
-    <ProjectReference Include="K:\programming\workspace\YouTubeLiveCommentViewer\\ISitePlugin\ISitePlugin\SitePlugin.csproj">
-      <Project>{c13bfdf0-3b93-475f-900e-e7bad97ace3d}</Project>
-      <Name>SitePlugin</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="MvvmLightLibs">

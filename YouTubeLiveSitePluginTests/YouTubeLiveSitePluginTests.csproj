@@ -70,18 +70,6 @@
       <Project>{d3fd476c-9801-4861-8fa1-c3d57ff30c83}</Project>
       <Name>YouTubeLiveSitePlugin</Name>
     </ProjectReference>
-    <ProjectReference Include="K:\programming\workspace\YouTubeLiveCommentViewer\\Common\Common\Common.csproj">
-      <Project>{66D18DE1-4D66-41A5-B0E2-47DF9975495A}</Project>
-      <Name>Common</Name>
-    </ProjectReference>
-    <ProjectReference Include="K:\programming\workspace\YouTubeLiveCommentViewer\\ISitePlugin\ISitePlugin\SitePlugin.csproj">
-      <Project>{C13BFDF0-3B93-475F-900E-E7BAD97ACE3D}</Project>
-      <Name>SitePlugin</Name>
-    </ProjectReference>
-    <ProjectReference Include="K:\programming\workspace\YouTubeLiveCommentViewer\\BrowserCookieInterfaces\BrowserCookieInterfaces\BrowserCookieInterfaces.csproj">
-      <Project>{CDBBBF25-AD0C-4EAF-B673-EB0BB198585A}</Project>
-      <Name>BrowserCookieInterfaces</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Content Include="SampleData\Channel_on_air.txt">

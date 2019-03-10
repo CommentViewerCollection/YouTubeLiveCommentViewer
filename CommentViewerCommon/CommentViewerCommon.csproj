@@ -58,18 +58,6 @@
       <Project>{66d18de1-4d66-41a5-b0e2-47df9975495a}</Project>
       <Name>Common</Name>
     </ProjectReference>
-    <ProjectReference Include="K:\programming\workspace\YouTubeLiveCommentViewer\\BrowserCookieImplementations\BrowserCookieImplementations\BrowserCookieImplementations.csproj">
-      <Project>{dfe01d83-bdbf-4b5c-95d5-9f1034597ede}</Project>
-      <Name>BrowserCookieImplementations</Name>
-    </ProjectReference>
-    <ProjectReference Include="K:\programming\workspace\YouTubeLiveCommentViewer\\BrowserCookieInterfaces\BrowserCookieInterfaces\BrowserCookieInterfaces.csproj">
-      <Project>{cdbbbf25-ad0c-4eaf-b673-eb0bb198585a}</Project>
-      <Name>BrowserCookieInterfaces</Name>
-    </ProjectReference>
-    <ProjectReference Include="K:\programming\workspace\YouTubeLiveCommentViewer\\Common\Common\Common.csproj">
-      <Project>{66d18de1-4d66-41a5-b0e2-47df9975495a}</Project>
-      <Name>Common</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

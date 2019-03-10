@@ -61,10 +61,6 @@
       <Project>{cdbbbf25-ad0c-4eaf-b673-eb0bb198585a}</Project>
       <Name>BrowserCookieInterfaces</Name>
     </ProjectReference>
-    <ProjectReference Include="K:\programming\workspace\YouTubeLiveCommentViewer\\BrowserCookieInterfaces\BrowserCookieInterfaces\BrowserCookieInterfaces.csproj">
-      <Project>{cdbbbf25-ad0c-4eaf-b673-eb0bb198585a}</Project>
-      <Name>BrowserCookieInterfaces</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="System.Data.SQLite.Core">
