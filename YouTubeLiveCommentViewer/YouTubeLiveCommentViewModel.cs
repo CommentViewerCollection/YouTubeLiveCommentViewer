@@ -59,6 +59,9 @@ namespace YouTubeLiveCommentViewer.ViewModel
                     case nameof(_metadata.FontSize):
                         RaisePropertyChanged(nameof(FontSize));
                         break;
+                    case nameof(_metadata.IsNameWrapping):
+                        RaisePropertyChanged(nameof(UserNameWrapping));
+                        break;
                 }
             };
             if (_metadata.User != null)
@@ -174,8 +177,14 @@ namespace YouTubeLiveCommentViewer.ViewModel
         {
             get
             {
-                //TODO:Wrapにも対応しないと。
-                return TextWrapping.NoWrap;
+                if (_metadata.IsNameWrapping)
+                {
+                    return TextWrapping.Wrap;
+                }
+                else
+                {
+                    return TextWrapping.NoWrap;
+                }
             }
         }
         public bool ContainsUrl
