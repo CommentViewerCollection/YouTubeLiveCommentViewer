@@ -80,6 +80,7 @@ namespace BouyomiPlugin
         {
             if (!_options.IsEnabled || data.IsNgUser || data.IsFirstComment || (data.Is184&& !_options.Want184Read))
                 return;
+
             try
             {
                 //棒読みちゃんが事前に起動されていたらそれを使いたい。
@@ -178,7 +179,11 @@ namespace BouyomiPlugin
                         break;
                 }
             }
-
+            //nameがnullでは無い場合かつUser.Nicknameがある場合はNicknameを採用
+            if (!string.IsNullOrEmpty(name) && messageMetadata.User != null && !string.IsNullOrEmpty(messageMetadata.User.Nickname))
+            {
+                name = messageMetadata.User.Nickname;
+            }
             try
             {
                 //棒読みちゃんが事前に起動されていたらそれを使いたい。
